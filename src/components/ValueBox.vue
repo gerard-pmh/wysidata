@@ -4,29 +4,20 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import { useStore } from 'vuex'
 
-const props = defineProps({
-  componentId: {
-    type: Number,
-    required: true
-  },
-  boxId: {
-    type: Number,
-    required: true
-  },
-  defaultValue: {
-    type: String,
-    default: 'Write / Drop text here'
-  },
-  currentValue: String
-})
+const props = defineProps<{
+  componentId: number,
+  boxId: number,
+  defaultValue: string,
+  currentValue?: string
+}>()
 
 const store = useStore()
 
-function handleDrop () {
-  const { componentId, boxId } = props
-  store.dispatch('dropApiField', { componentId, boxId })
+function handleDrop(): void {
+  const {componentId, boxId} = props
+  store.dispatch('dropApiField', {componentId, boxId})
 }
 </script>

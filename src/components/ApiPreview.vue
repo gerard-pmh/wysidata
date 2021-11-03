@@ -22,18 +22,18 @@
   </div>
 </template>
 
-<script setup>
-import { useStore } from 'vuex'
+<script lang="ts" setup>
+import { useStore } from "../store";
 
 const store = useStore()
 
 const apis = store.state.apis
 
-function deleteApi(id) {
+function deleteApi(id: number): void {
   store.dispatch('deleteApi', id)
 }
 
-function handleDragStart(id, field) {
-  store.dispatch('dragApiField', { id, field })
+function handleDragStart(id: number, field: string): void {
+  store.dispatch('dragApiField', {id, field})
 }
 </script>

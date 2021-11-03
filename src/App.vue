@@ -11,7 +11,7 @@
 
     <div class="flex-grow bg-blue-200 p-5">
       <div v-for="comp in store.state.components" class="bg-blue-400 m-5">
-        <component :component-id="comp.id" :is="comp.template"></component>
+        <component :is="comp.template" :component-id="comp.id"></component>
       </div>
     </div>
 
@@ -26,19 +26,18 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts" setup>
 import ApiPreview from './components/ApiPreview.vue'
-import ValueBox from './components/ValueBox.vue'
-import { onMounted, ref } from 'vue'
-import { useStore } from 'vuex'
+import { onMounted, Ref, ref } from 'vue'
+import { useStore } from "./store";
 
 const store = useStore()
 
 onMounted(() => store.dispatch('addApi', 'https://my-json-server.typicode.com/typicode/demo/comments'))
 
-const apiUrl = ref('')
+const apiUrl: Ref<string> = ref('')
 
-function addApi () {
+function addApi(): void {
   store.dispatch('addApi', apiUrl.value)
 }
 </script>

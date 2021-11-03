@@ -1,17 +1,14 @@
 <template>
   <h1>
-    <ValueBox :component-id="componentId" value-id="1"></ValueBox>
+    <ValueBox default-value="Title" :component-id="componentId" box-id="1"></ValueBox>
   </h1>
 </template>
 
-<script setup>
-import ValueBox from '../ValueBox'
+<script lang="ts" setup>
+import ValueBox from '../ValueBox.vue'
 import { defineProps } from 'vue'
 
-defineProps({
-  componentId: {
-    type: Number,
-    required: true
-  }
-})
+defineProps<{
+  componentId: number
+}>()
 </script>

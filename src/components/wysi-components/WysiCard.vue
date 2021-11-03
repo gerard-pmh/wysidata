@@ -1,28 +1,25 @@
 <template>
   <div class="bg-red-400">
     <h1>
-      <ValueBox :component-id="componentId" box-id="1"></ValueBox>
+      <ValueBox default-value="Title" :component-id="componentId" box-id="1"></ValueBox>
     </h1>
     <h2>
-      <ValueBox :component-id="componentId" box-id="2"></ValueBox>
+      <ValueBox default-value="Subtitle" :component-id="componentId" box-id="2"></ValueBox>
     </h2>
     <p>
-      <ValueBox :component-id="componentId" box-id="3"></ValueBox>
+      <ValueBox default-value="Content" :component-id="componentId" box-id="3"></ValueBox>
     </p>
     <div>
-      <ValueBox :component-id="componentId" box-id="4"></ValueBox>
+      <ValueBox default-value="Footer" :component-id="componentId" box-id="4"></ValueBox>
     </div>
   </div>
 </template>
 
-<script setup>
-import ValueBox from '../ValueBox'
+<script lang="ts" setup>
+import ValueBox from '../ValueBox.vue';
 import { defineProps } from 'vue'
 
-defineProps({
-  componentId: {
-    type: Number,
-    required: true
-  }
-})
+defineProps<{
+  componentId: number
+}>()
 </script>
