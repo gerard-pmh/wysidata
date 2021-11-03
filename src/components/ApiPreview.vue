@@ -33,7 +33,7 @@ function deleteApi(id: number): void {
   store.dispatch('deleteApi', id)
 }
 
-function handleDragStart(id: number, field: string): void {
-  store.dispatch('dragApiField', {id, field})
+function handleDragStart(apiId: number, apiField: string): void {
+  store.dispatch('dragApiField', {apiId, apiField})
 }
 </script>

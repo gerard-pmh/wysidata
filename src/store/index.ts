@@ -13,6 +13,13 @@ export interface Api {
   fields?: string[];
 }
 
+export interface WysiMapping {
+  compId: number;
+  boxId: number;
+  apiId: number;
+  apiField: string;
+}
+
 export interface WysiComponent {
   id: number;
   template: string;
@@ -20,14 +27,15 @@ export interface WysiComponent {
 
 export interface DraggedApiField {
   apiId: number;
-  field: string;
+  apiField: string;
 }
 
 export interface State {
   apiIdSeq: number;
   apis: Api[];
-  componentIdSeq: number;
+  compIdSeq: number;
   components: WysiComponent[];
+  mappings: WysiMapping[];
   draggedApiField?: DraggedApiField;
 }
 
@@ -41,14 +49,34 @@ export const store = createStore<State>({
   state: {
     apiIdSeq: 0,
     apis: [],
-    componentIdSeq: 4,
+    compIdSeq: 4,
     components: [
-      { id: 1, template: 'WysiTitle' },
-      { id: 2, template: 'WysiParagraph' },
-      { id: 3, template: 'WysiCard' },
+      { id: 1, template: 'wysi-title' },
+      { id: 2, template: 'wysi-paragraph' },
+      { id: 3, template: 'wysi-card' },
     ],
+    mappings: [],
   },
-  getters: {},
+  getters: {
+    getMappingValue:
+      state =>
+      (compId: number, boxId: number): WysiMapping | undefined => {
+        const mapping = state.mappings.find(
+          m => m.compId === compId && m.boxId === boxId
+        );
+        if (!mapping) {
+          return undefined;
+        }
+        const api = state.apis.find(a => a.id === mapping.apiId);
+        if (!api) {
+          return undefined;
+        }
+        if (api.isArray) {
+          return api.resData[0][mapping.apiField];
+        }
+        return api.resData[mapping.apiField];
+      },
+  },
   mutations: {
     incrementApiId(state) {
       state.apiIdSeq++;
@@ -83,15 +111,15 @@ export const store = createStore<State>({
     dragApiField(state, payload: DraggedApiField) {
       state.draggedApiField = payload;
     },
-    dropApiField(
-      state,
-      { componentId, boxId }: { componentId: number; boxId: number }
-    ) {
-      const index = state.components.findIndex(c => c.id === componentId);
-      const component = state.components[index];
-      state.components[index] = {
-        ...component,
-      };
+    dropApiField(state, { compId, boxId }: { compId: number; boxId: number }) {
+      if (!state.draggedApiField) {
+        return;
+      }
+      state.mappings.push({
+        compId,
+        boxId,
+        ...state.draggedApiField,
+      });
     },
   },
   actions: {
@@ -112,7 +140,7 @@ export const store = createStore<State>({
     dragApiField({ commit }, payload: DraggedApiField) {
       commit('dragApiField', payload);
     },
-    dropApiField({ commit }, payload) {
+    dropApiField({ commit, state }, payload) {
       commit('dropApiField', payload);
     },
   },

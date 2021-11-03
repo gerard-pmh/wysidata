@@ -1,23 +1,24 @@
 <template>
-  <div @drop="handleDrop()" @dragover.prevent @dragenter.prevent>
-    {{ currentValue ?? defaultValue }}
+  <div @drop="handleDrop()" @dragover.prevent @dragenter.prevent class="border-pink-700 border-2">
+    {{ getMappingValue(compId, boxId) || defaultValue }}
   </div>
 </template>
 
 <script lang="ts" setup>
-import { useStore } from 'vuex'
+import { useStore } from '../store'
 
 const props = defineProps<{
-  componentId: number,
+  compId: number,
   boxId: number,
-  defaultValue: string,
-  currentValue?: string
+  defaultValue: string
 }>()
 
 const store = useStore()
 
 function handleDrop(): void {
-  const {componentId, boxId} = props
-  store.dispatch('dropApiField', {componentId, boxId})
+  const {compId, boxId} = props
+  store.dispatch('dropApiField', {compId, boxId})
 }
+
+const getMappingValue = store.getters.getMappingValue
 </script>

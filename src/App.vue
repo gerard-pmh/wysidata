@@ -9,11 +9,12 @@
       </div>
     </div>
 
-    <div class="flex-grow bg-blue-200 p-5">
+    <div class="flex-grow bg-blue-200 p-5 select-none">
       <div v-for="comp in store.state.components" class="bg-blue-400 m-5">
-        <component :is="comp.template" :component-id="comp.id"></component>
+        <component :is="componentMap[comp.template]" :comp-id="comp.id"></component>
       </div>
     </div>
+
 
     <div class="bg-blue-400 w-1/4 font-mono">
       <div>
@@ -28,10 +29,19 @@
 
 <script lang="ts" setup>
 import ApiPreview from './components/ApiPreview.vue'
+import WysiCard from './components/wysi-components/WysiCard.vue'
+import WysiParagraph from './components/wysi-components/WysiParagraph.vue'
+import WysiTitle from './components/wysi-components/WysiTitle.vue'
 import { onMounted, Ref, ref } from 'vue'
 import { useStore } from "./store";
 
 const store = useStore()
+
+const componentMap = {
+  'wysi-title': WysiTitle,
+  'wysi-paragraph': WysiParagraph,
+  'wysi-card': WysiCard
+}
 
 onMounted(() => store.dispatch('addApi', 'https://my-json-server.typicode.com/typicode/demo/comments'))
 
