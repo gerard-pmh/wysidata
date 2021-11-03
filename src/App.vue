@@ -1,26 +1,24 @@
 <template>
-  <div class="flex min-h-screen font-sans">
-    <div class="bg-blue-400 w-1/4 select-none">
-      <div class="bg-blue-200 m-2 p-1" draggable="true">
-        <h1>Title</h1>
-      </div>
-      <div class="bg-blue-200 m-2 p-1">
-        <p>Paragraph</p>
+  <div class="grid grid-cols-4 min-h-screen font-sans">
+    <div class="bg-gray-200 select-none">
+      <div class="bg-gray-100 m-2 p-2 rounded" v-for="comp in Object.keys(componentMap)" draggable="true">
+        {{ comp }}
       </div>
     </div>
 
-    <div class="flex-grow bg-blue-200 p-5 select-none">
-      <div v-for="comp in store.state.components" class="bg-blue-400 m-5">
+    <div class="bg-gray-100 p-5 select-none col-span-2">
+      <div v-for="comp in store.state.components" class="bg-gray-200 m-5 p-5 rounded">
         <component :is="componentMap[comp.template]" :comp-id="comp.id"></component>
       </div>
     </div>
 
-
-    <div class="bg-blue-400 w-1/4 font-mono">
-      <div>
+    <div class="bg-gray-200">
+      <div class="flex">
         <!-- ici requêter directement l'api pour vérifier si elle est ok avant de l'ajouter -->
-        <input v-model="apiUrl" class="bg-blue-200 border-2 p-1 border-blue-600 w-full text-xs" type="text">
-        <button @click="addApi()">+</button>
+        <div class="flex-grow">
+          <input v-model="apiUrl" class="bg-gray-100 border-2 p-2 focus:outline-none border-indigo-100 focus:border-indigo-400 w-full text-xs font-mono rounded" type="text">
+        </div>
+        <button @click="addApi()" class="px-2 text-green-500 font-bold bg-white rounded">+</button>
       </div>
       <ApiPreview/>
     </div>
@@ -43,7 +41,7 @@ const componentMap = {
   'wysi-card': WysiCard
 }
 
-onMounted(() => store.dispatch('addApi', 'https://my-json-server.typicode.com/typicode/demo/comments'))
+onMounted(() => store.dispatch('addApi', 'https://api.themoviedb.org/3/search/movie?query=star&api_key=1bfe018b8cc0679115b416563dee86bc'))
 
 const apiUrl: Ref<string> = ref('')
 

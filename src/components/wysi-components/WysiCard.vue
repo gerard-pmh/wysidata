@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-red-400">
+  <div>
     <h1>
       <ValueBox default-value="Title" :comp-id="compId" :box-id="1"></ValueBox>
     </h1>

@@ -6,7 +6,7 @@
     </div>
     <button @click="deleteApi(api.id)">delete</button>
 
-    <div v-if="api.isLoading">loading ...</div>
+    <div v-if="api.loading">loading ...</div>
 
     <div v-else-if="api.error">{{ api.error }}</div>
 
