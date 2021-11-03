@@ -1,11 +1,13 @@
 <template>
   <div @drop="handleDrop()" @dragover.prevent @dragenter.prevent class="border-pink-700 border-2">
-    {{ getMappingValue(compId, boxId) || defaultValue }}
+    <span v-if="currentValue">{{ currentValue }}</span>
+    <span v-else class="text-gray-600">{{ defaultValue }}</span>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { useStore } from '../store'
+import { computed } from "vue";
 
 const props = defineProps<{
   compId: number,
@@ -20,5 +22,6 @@ function handleDrop(): void {
   store.dispatch('dropApiField', {compId, boxId})
 }
 
-const getMappingValue = store.getters.getMappingValue
+// here we use computed to get a fresh value when the getter is updated
+const currentValue = computed(() => store.getters.getMappingValue(props.compId, props.boxId))
 </script>

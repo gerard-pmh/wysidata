@@ -115,11 +115,22 @@ export const store = createStore<State>({
       if (!state.draggedApiField) {
         return;
       }
-      state.mappings.push({
-        compId,
-        boxId,
-        ...state.draggedApiField,
-      });
+      const index = state.mappings.findIndex(
+        m => m.compId === compId && m.boxId === boxId
+      );
+      if (index > -1) {
+        const mapping = state.mappings[index];
+        state.mappings[index] = {
+          ...mapping,
+          ...state.draggedApiField,
+        };
+      } else {
+        state.mappings.push({
+          compId,
+          boxId,
+          ...state.draggedApiField,
+        });
+      }
     },
   },
   actions: {
