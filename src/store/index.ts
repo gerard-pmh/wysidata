@@ -60,7 +60,7 @@ export const store = createStore<State>({
   getters: {
     getMappingValue:
       state =>
-      (compId: number, boxId: number): WysiMapping | undefined => {
+      (compId: number, boxId: number): any => {
         const mapping = state.mappings.find(
           m => m.compId === compId && m.boxId === boxId
         );
