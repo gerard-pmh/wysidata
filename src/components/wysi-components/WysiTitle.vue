@@ -1,6 +1,6 @@
 <template>
   <h1>
-    <ValueBox default-value="Title" :comp-id="compId" :box-id="1"></ValueBox>
+    <ValueBox default-value="Title" :comp-id="compId" :comp-index="compIndex" :box-id="1"></ValueBox>
   </h1>
 </template>
 
@@ -8,6 +8,7 @@
 import ValueBox from '../ValueBox.vue'
 
 defineProps<{
-  compId: number
+  compId: number,
+  compIndex: number
 }>()
 </script>

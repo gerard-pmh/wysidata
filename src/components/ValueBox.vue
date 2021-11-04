@@ -11,6 +11,7 @@ import { computed } from "vue";
 
 const props = defineProps<{
   compId: number,
+  compIndex: number,
   boxId: number,
   defaultValue: string
 }>()
@@ -23,5 +24,5 @@ function handleDrop(): void {
 }
 
 // here we use computed to get a fresh value when the getter is updated
-const currentValue = computed(() => store.getters.getMappingValue(props.compId, props.boxId))
+const currentValue = computed(() => store.getters.getMappingValue(props.compId, props.compIndex, props.boxId))
 </script>

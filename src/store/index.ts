@@ -60,7 +60,7 @@ export const store = createStore<State>({
   getters: {
     getMappingValue:
       state =>
-      (compId: number, boxId: number): any => {
+      (compId: number, compIndex: number, boxId: number): any => {
         const mapping = state.mappings.find(
           m => m.compId === compId && m.boxId === boxId
         );
@@ -72,9 +72,23 @@ export const store = createStore<State>({
           return undefined;
         }
         if (api.isArray) {
-          return api.resData[0][mapping.apiField];
+          console.log(compIndex)
+          return api.resData[compIndex][mapping.apiField];
         }
         return api.resData[mapping.apiField];
+      },
+    getComponentCount:
+      state =>
+      (compId: number): number => {
+        const mappings = state.mappings.filter(m => m.compId === compId);
+        const apiIds = mappings.map(m => m.apiId);
+        const apiArray = state.apis
+          .filter(a => apiIds.includes(a.id))
+          .find(a => a.isArray);
+        if (apiArray) {
+          return apiArray.resData.length;
+        }
+        return 1;
       },
   },
   mutations: {
