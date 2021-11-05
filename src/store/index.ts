@@ -72,7 +72,7 @@ export const store = createStore<State>({
           return undefined;
         }
         if (api.isArray) {
-          console.log(compIndex)
+          console.log(compIndex);
           return api.resData[compIndex][mapping.apiField];
         }
         return api.resData[mapping.apiField];
@@ -146,6 +146,9 @@ export const store = createStore<State>({
         });
       }
     },
+    endDragApiField(state) {
+      state.draggedApiField = undefined;
+    },
   },
   actions: {
     async addApi({ commit, state }, url: string) {
@@ -167,6 +170,7 @@ export const store = createStore<State>({
     },
     dropApiField({ commit, state }, payload) {
       commit('dropApiField', payload);
+      commit('endDragApiField');
     },
   },
 });

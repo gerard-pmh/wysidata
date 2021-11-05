@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-gray-100 rounded">
+  <div class="bg-gray-500 rounded p-2 my-2">
     <h1>
       <ValueBox default-value="Title" :comp-id="compId" :comp-index="compIndex" :box-id="1"></ValueBox>
     </h1>

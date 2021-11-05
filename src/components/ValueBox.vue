@@ -1,7 +1,7 @@
 <template>
-  <div @drop="handleDrop()" @dragover.prevent @dragenter.prevent class="bg-white m-2 p-2 bg-gray-100">
+  <div @drop="handleDrop()" @dragover.prevent @dragenter.prevent class="bg-gray-600 my-2 p-2 text-white rounded">
     <span v-if="currentValue">{{ currentValue }}</span>
-    <span v-else class="text-gray-600">{{ defaultValue }}</span>
+    <span v-else class="text-gray-200">{{ defaultValue }}</span>
   </div>
 </template>
 

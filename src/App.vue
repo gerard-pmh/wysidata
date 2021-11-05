@@ -1,13 +1,14 @@
 <template>
-  <div class="min-h-screen font-sans grid grid-cols-4">
-    <div class="bg-gray-200 select-none">
-      <div class="m-2 p-2 bg-gray-300 rounded" v-for="comp in Object.keys(componentMap)" draggable="true">
+  <div class="min-h-screen font-sans text-gray-50 grid grid-cols-4">
+
+    <div class="select-none bg-gray-800">
+      <div class="m-2 p-2 bg-gray-600 rounded" v-for="comp in Object.keys(componentMap)" draggable="true">
         {{ comp }}
       </div>
     </div>
 
-    <div class="col-span-2 p-5 bg-gray-100 select-none">
-      <div v-for="comp in store.state.components" class="m-5 p-5 bg-gray-200 rounded">
+    <div class="col-span-2 p-5 bg-gray-700 select-none">
+      <div v-for="comp in store.state.components" class="my-5">
         <component v-for="n in getComponentCount(comp.id)"
                    :is="componentMap[comp.template]"
                    :comp-id="comp.id"
@@ -17,6 +18,7 @@
     </div>
 
     <ApiPanel/>
+
   </div>
 </template>
 

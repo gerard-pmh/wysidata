@@ -1,9 +1,14 @@
 <template>
-  <div class="p-2 bg-gray-200">
+  <div class="p-2 bg-gray-800">
+
     <ApiAddInput @addApi="handleAddApi($event)"/>
-    <ApiPreview v-for="api in apis" :key="api.id" :api="api"
+
+    <ApiPreview v-for="api in apis"
+                :key="api.id"
+                :api="api"
                 @deleteApi="handleDeleteApi($event)"
                 @dragApiField="handleDragApiField($event)"/>
+
   </div>
 </template>
 
