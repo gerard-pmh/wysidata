@@ -1,33 +1,24 @@
 import { createStore, Store, useStore as baseUseStore } from 'vuex';
 import axios, { AxiosResponse } from 'axios';
-import { findResponseAttr } from '../utils/findResponseAttr';
+import {
+  Api,
+  ApiFieldStructure,
+  ApiRootStructure,
+  getApiFieldData,
+  getApiFieldLength,
+  parseApiResponseRootStructure
+} from '../utils/apiUtils';
 import { InjectionKey } from 'vue';
-
-export interface Api {
-  id: number;
-  url: string;
-  loading: boolean;
-  error?: string;
-  isArray?: boolean;
-  resData?: any;
-  fields?: string[];
-}
 
 export interface WysiMapping {
   compId: number;
   boxId: number;
-  apiId: number;
-  apiField: string;
+  apiField: ApiFieldStructure;
 }
 
 export interface WysiComponent {
   id: number;
   template: string;
-}
-
-export interface DraggedApiField {
-  apiId: number;
-  apiField: string;
 }
 
 export interface State {
@@ -36,7 +27,7 @@ export interface State {
   compIdSeq: number;
   components: WysiComponent[];
   mappings: WysiMapping[];
-  draggedApiField?: DraggedApiField;
+  draggedApiField?: ApiFieldStructure;
 }
 
 export const key: InjectionKey<Store<State>> = Symbol();
@@ -53,9 +44,9 @@ export const store = createStore<State>({
     components: [
       { id: 1, template: 'wysi-title' },
       { id: 2, template: 'wysi-paragraph' },
-      { id: 3, template: 'wysi-card' },
+      { id: 3, template: 'wysi-card' }
     ],
-    mappings: [],
+    mappings: []
   },
   getters: {
     getMappingValue:
@@ -67,29 +58,28 @@ export const store = createStore<State>({
         if (!mapping) {
           return undefined;
         }
-        const api = state.apis.find(a => a.id === mapping.apiId);
+        const api = mapping.apiField.api;
         if (!api) {
           return undefined;
         }
-        if (api.isArray) {
-          console.log(compIndex);
-          return api.resData[compIndex][mapping.apiField];
+        if (api.structure?.isArray) {
+          return getApiFieldData(
+            api.resData[compIndex],
+            mapping.apiField,
+            compIndex
+          );
         }
-        return api.resData[mapping.apiField];
+        return getApiFieldData(api.resData, mapping.apiField, compIndex);
       },
     getComponentCount:
       state =>
       (compId: number): number => {
         const mappings = state.mappings.filter(m => m.compId === compId);
-        const apiIds = mappings.map(m => m.apiId);
-        const apiArray = state.apis
-          .filter(a => apiIds.includes(a.id))
-          .find(a => a.isArray);
-        if (apiArray) {
-          return apiArray.resData.length;
+        if (mappings.length) {
+          return Math.max(...mappings.map(m => getApiFieldLength(m.apiField)));
         }
         return 1;
-      },
+      }
   },
   mutations: {
     incrementApiId(state) {
@@ -100,14 +90,14 @@ export const store = createStore<State>({
     },
     apiDataLoaded(state, { id, res }: { id: number; res: AxiosResponse }) {
       const index = state.apis.findIndex(api => api.id === id);
-      const api = state.apis[index];
-      state.apis[index] = {
+      let api = state.apis[index];
+      api = {
         ...api,
         loading: false,
-        resData: res.data,
-        isArray: Array.isArray(res.data),
-        fields: findResponseAttr(res.data),
+        resData: res.data
       };
+      api.structure = parseApiResponseRootStructure(api);
+      state.apis[index] = api;
     },
     apiDataError(state, { id, error }: { id: number; error: string }) {
       const index = state.apis.findIndex(a => a.id === id);
@@ -115,14 +105,14 @@ export const store = createStore<State>({
       state.apis[index] = {
         ...api,
         loading: false,
-        error: error.toString(),
+        error: error.toString()
       };
     },
     deleteApi(state, id: number) {
       const index = state.apis.findIndex(a => a.id === id);
       state.apis.splice(index, 1);
     },
-    dragApiField(state, payload: DraggedApiField) {
+    dragApiField(state, payload: ApiFieldStructure) {
       state.draggedApiField = payload;
     },
     dropApiField(state, { compId, boxId }: { compId: number; boxId: number }) {
@@ -136,19 +126,21 @@ export const store = createStore<State>({
         const mapping = state.mappings[index];
         state.mappings[index] = {
           ...mapping,
-          ...state.draggedApiField,
+          ...state.draggedApiField
         };
       } else {
         state.mappings.push({
           compId,
           boxId,
-          ...state.draggedApiField,
+          apiField: {
+            ...state.draggedApiField
+          }
         });
       }
     },
     endDragApiField(state) {
       state.draggedApiField = undefined;
-    },
+    }
   },
   actions: {
     async addApi({ commit, state }, url: string) {
@@ -165,12 +157,12 @@ export const store = createStore<State>({
     deleteApi({ commit }, id: number) {
       commit('deleteApi', id);
     },
-    dragApiField({ commit }, payload: DraggedApiField) {
+    dragApiField({ commit }, payload: ApiFieldStructure) {
       commit('dragApiField', payload);
     },
     dropApiField({ commit, state }, payload) {
       commit('dropApiField', payload);
       commit('endDragApiField');
-    },
-  },
+    }
+  }
 });
