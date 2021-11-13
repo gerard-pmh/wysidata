@@ -3,7 +3,6 @@ import axios, { AxiosResponse } from 'axios';
 import {
   Api,
   ApiFieldStructure,
-  ApiRootStructure,
   getApiFieldData,
   getApiFieldLength,
   parseApiResponseRootStructure
