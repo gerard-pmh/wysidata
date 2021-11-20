@@ -9,15 +9,15 @@ import {
 } from '../utils/apiUtils';
 import { InjectionKey } from 'vue';
 
+export interface WysiComponent {
+  id: number;
+  template: string;
+}
+
 export interface WysiMapping {
   compId: number;
   boxId: number;
   apiField: ApiFieldStructure;
-}
-
-export interface WysiComponent {
-  id: number;
-  template: string;
 }
 
 export interface State {
