@@ -10,7 +10,9 @@ test('insert in multi dim array', () => {
     ]
   ];
 
-  expect(multiDimensionalInsert(7, multiDimArray, [2, 1, 1])).toStrictEqual([
+  multiDimensionalInsert(7, multiDimArray, [2, 1, 1]);
+
+  expect(multiDimArray).toStrictEqual([
     1,
     [1, 2],
     [

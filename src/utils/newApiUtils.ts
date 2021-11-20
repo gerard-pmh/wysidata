@@ -1,7 +1,8 @@
 import {
   multiDimensionalInsert,
   isNotObject,
-  MultiDimensionalArray
+  MultiDimensionalArray,
+  emptyMultiDimensionalArray
 } from './genericUtils';
 
 export interface ApiValues {
@@ -23,11 +24,10 @@ function extractValues(
   if (isNotObject(data)) {
     const strKey = keys.join('.');
     if (indexes.length) {
-      accumulator[strKey] = multiDimensionalInsert(
-        data,
-        accumulator[strKey],
-        indexes
-      );
+      const multiDimArray =
+        accumulator[strKey] ?? emptyMultiDimensionalArray(indexes.length);
+      multiDimensionalInsert(data, multiDimArray, indexes);
+      accumulator[strKey] = multiDimArray;
     } else {
       accumulator[strKey] = data;
     }

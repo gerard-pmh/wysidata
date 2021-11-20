@@ -10,33 +10,25 @@ export function multiDimensionalInsert<T>(
   value: T,
   multiDimArray: MultiDimensionalArray<T> | T,
   indexes: number[]
-): any {
-  if (!Array.isArray(multiDimArray)) {
-    multiDimArray = generateEmptyMultiDimArray(indexes.length);
-  }
+): void {
   if (!indexes.length) {
-    return multiDimArray;
+    return;
+  }
+  if (!Array.isArray(multiDimArray)) {
+    multiDimArray = emptyMultiDimensionalArray(indexes.length);
   }
   const i = indexes[0];
   if (indexes.length === 1) {
-    if (multiDimArray[i] === undefined) {
-      return [...multiDimArray.slice(0, i), value];
+    multiDimArray.splice(i, 0, value);
+  } else {
+    if (!Array.isArray(multiDimArray[i])) {
+      multiDimArray[i] = emptyMultiDimensionalArray(indexes.length - 1);
     }
-    return [
-      ...multiDimArray.slice(0, i),
-      value,
-      multiDimArray[i],
-      ...multiDimArray.slice(i + 1)
-    ];
+    multiDimensionalInsert(value, multiDimArray[i], indexes.slice(1));
   }
-  return [
-    ...multiDimArray.slice(0, i),
-    multiDimensionalInsert(value, multiDimArray[i], indexes.slice(1)),
-    ...multiDimArray.slice(i + 1)
-  ];
 }
 
-function generateEmptyMultiDimArray<T>(
+export function emptyMultiDimensionalArray<T>(
   depth: number
 ): MultiDimensionalArray<T> {
   let multiDimArray: MultiDimensionalArray<T> = [];
