@@ -1,112 +1,106 @@
+import {
+  multiDimensionalInsert,
+  isNotObject,
+  MultiDimensionalArray,
+  emptyMultiDimensionalArray
+} from './genericUtils';
+
 export interface Api {
   id: number;
   url: string;
   loading: boolean;
   error?: string;
   resData?: any;
-  structure?: ApiRootStructure;
+  structure?: ApiStructure;
 }
 
-export interface ApiRootStructure {
-  api: Api;
-  isArray: boolean;
-  children: ApiFieldStructure[];
-}
-
-export interface ApiFieldStructure extends ApiRootStructure {
+export interface ApiStructure {
   key: string;
-  path: ApiFieldStructure[];
+  path: string[];
+  isArray: boolean;
+  fields?: ApiStructure[];
+  value?: ApiValue;
 }
 
-export function parseApiResponseRootStructure(
-  api: Api,
-  data?: any,
-  isArray: boolean = false
-): ApiRootStructure {
-  const resData = data ?? api.resData;
-  if (typeof resData !== 'object' || resData === null) {
-    return { api, isArray, children: [] };
-  }
-  if (Array.isArray(resData)) {
-    if (resData.length) {
-      // FIXME how to handle nested arrays ?
-      return parseApiResponseRootStructure(api, resData[0], true);
-    }
-    return { api, isArray: true, children: [] };
-  }
-  return {
-    api,
-    isArray,
-    children: Object.keys(resData).map(key =>
-      parseApiResponseFieldStructure(api, key, resData[key], [])
-    )
-  };
+export type ApiValue = MultiDimensionalArray<string | number | boolean | null>;
+
+export interface ApiValues {
+  [key: string]: ApiValue;
 }
 
-function parseApiResponseFieldStructure(
-  api: Api,
-  key: string,
-  data: any,
-  path: ApiFieldStructure[],
-  isArray: boolean = false
-): ApiFieldStructure {
-  if (typeof data !== 'object') {
-    return { api, isArray, children: [], key, path };
-  }
-  if (Array.isArray(data)) {
-    if (data.length) {
-      // FIXME how to handle nested arrays ?
-      return parseApiResponseFieldStructure(api, key, data[0], path, true);
-    }
-    return { api, isArray: true, children: [], key, path };
-  }
-  const parsedField: ApiFieldStructure = {
-    api,
-    isArray,
-    path,
-    key,
-    children: []
-  };
-  const childPath = [...path, parsedField];
-  parsedField.children = Object.keys(data).map(childKey =>
-    parseApiResponseFieldStructure(api, childKey, data[childKey], childPath)
+export function extractApiStructureFromRoot(apiRootData: any) {
+  const apiLeafValues = extractValuesFromRoot(apiRootData);
+  return extractApiStructure(
+    apiRootData,
+    'root',
+    [],
+    Array.isArray(apiRootData),
+    apiLeafValues
   );
-  return parsedField;
 }
 
-export function getApiFieldData(
-  resData: any,
-  field: ApiFieldStructure,
-  compIndex: number
-) {
-  let nestedData = resData;
-  for (let parentField of field.path) {
-    if (parentField.isArray) {
-      nestedData = nestedData[parentField.key][compIndex];
-    } else {
-      nestedData = nestedData[parentField.key];
+function extractApiStructure(
+  data: any,
+  key: string,
+  path: string[],
+  isArray: boolean,
+  apiLeafValues: ApiValues
+): ApiStructure {
+  if (isNotObject(data)) {
+    const value = apiLeafValues[path.join('.')];
+    return {
+      key,
+      path,
+      isArray,
+      value
+    };
+  } else if (Array.isArray(data)) {
+    if (data.length) {
+      return extractApiStructure(data[0], key, path, true, apiLeafValues);
     }
+    return { key, path, isArray: true };
+  } else {
+    const fields = Object.entries(data).map(([k, v]) =>
+      extractApiStructure(v, k, [...path, k], isArray, apiLeafValues)
+    );
+    return {
+      key,
+      path,
+      isArray,
+      fields
+    };
   }
-  if (field.isArray) {
-    return nestedData[compIndex][field.key];
-  }
-  return nestedData[field.key];
 }
 
-export function getApiFieldLength(field: ApiFieldStructure): number {
-  let nestedData = field.api.resData;
-  if (field.api.structure?.isArray) {
-    return nestedData.length;
-  }
-  for (let parentField of field.path) {
-    if (parentField.isArray) {
-      return nestedData[parentField.key].length;
+export function extractValuesFromRoot(apiRootData: any): ApiValues {
+  const accumulator: ApiValues = {};
+  extractValues(apiRootData, accumulator, [], []);
+  return accumulator;
+}
+
+function extractValues(
+  data: any,
+  accumulator: ApiValues,
+  keys: string[],
+  indexes: number[]
+): void {
+  if (isNotObject(data)) {
+    const strKey = keys.join('.');
+    if (indexes.length) {
+      const multiDimArray =
+        accumulator[strKey] ?? emptyMultiDimensionalArray(indexes.length);
+      multiDimensionalInsert(data, multiDimArray, indexes);
+      accumulator[strKey] = multiDimArray;
     } else {
-      nestedData = nestedData[parentField.key];
+      accumulator[strKey] = data;
     }
+  } else if (Array.isArray(data)) {
+    data.forEach((d, i) =>
+      extractValues(d, accumulator, keys, [...indexes, i])
+    );
+  } else {
+    Object.entries(data).forEach(([k, v]) => {
+      extractValues(v, accumulator, [...keys, k], indexes);
+    });
   }
-  if (field.isArray) {
-    return nestedData.length;
-  }
-  return 1;
 }

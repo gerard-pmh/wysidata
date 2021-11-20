@@ -1,115 +1,72 @@
-import {
-  ApiRootStructure,
-  getApiFieldData,
-  parseApiResponseRootStructure
-} from './apiUtils';
+import { extractValuesFromRoot } from './apiUtils';
 
-const emptyRoot: ApiRootStructure = {
-  isArray: false,
-  children: []
-};
-
-test('it should parse empty and raw data response', () => {
-  expect(parseApiResponseRootStructure(undefined)).toStrictEqual(emptyRoot);
-  expect(parseApiResponseRootStructure(null)).toStrictEqual(emptyRoot);
-  expect(parseApiResponseRootStructure(0)).toStrictEqual(emptyRoot);
-  expect(parseApiResponseRootStructure(5)).toStrictEqual(emptyRoot);
-  expect(parseApiResponseRootStructure(true)).toStrictEqual(emptyRoot);
-  expect(parseApiResponseRootStructure(false)).toStrictEqual(emptyRoot);
-  expect(parseApiResponseRootStructure('')).toStrictEqual(emptyRoot);
-  expect(parseApiResponseRootStructure('a raw string')).toStrictEqual(
-    emptyRoot
-  );
-  expect(parseApiResponseRootStructure({})).toStrictEqual(emptyRoot);
-});
-
-const emptyArrayRoot: ApiRootStructure = {
-  isArray: true,
-  children: []
-};
-
-test('it should parse empty and raw array response', () => {
-  expect(parseApiResponseRootStructure([])).toStrictEqual(emptyArrayRoot);
-  expect(parseApiResponseRootStructure([[]])).toStrictEqual(emptyArrayRoot);
-  expect(parseApiResponseRootStructure([[[]]])).toStrictEqual(emptyArrayRoot);
-  expect(parseApiResponseRootStructure(['A', 'B'])).toStrictEqual(
-    emptyArrayRoot
-  );
-  expect(parseApiResponseRootStructure([{}])).toStrictEqual(emptyArrayRoot);
-  expect(parseApiResponseRootStructure([{}, {}])).toStrictEqual(emptyArrayRoot);
-});
-
-test('it should parse simple object response', () => {
-  const apiRoot = parseApiResponseRootStructure({
-    key1: 'value1',
-    key2: 'value2'
-  });
-  expect(apiRoot.isArray).toStrictEqual(false);
-  expect(apiRoot.children.length).toStrictEqual(2);
-  expect(apiRoot.children[0]).toMatchObject({
-    key: 'key1',
-    children: [],
-    isArray: false,
-    parents: []
-  });
-  expect(apiRoot.children[1]).toMatchObject({
-    key: 'key2',
-    children: [],
-    isArray: false,
-    parents: []
-  });
-});
-
-test('it should parse simple array response', () => {
-  const apiRoot = parseApiResponseRootStructure([
-    {
-      key1: 'value1',
-      key2: 'value2'
-    },
-    {
-      key1: 'value1',
-      key2: 'value2'
-    }
-  ]);
-  expect(apiRoot.isArray).toStrictEqual(true);
-  expect(apiRoot.children.length).toStrictEqual(2);
-  expect(apiRoot.children[0]).toMatchObject({
-    key: 'key1',
-    children: [],
-    isArray: false,
-    parents: []
-  });
-  expect(apiRoot.children[1]).toMatchObject({
-    key: 'key2',
-    children: [],
-    isArray: false,
-    parents: []
-  });
-});
-
-test('it should parse nested object response', () => {
-  const resData = {
-    key1: { nestedKey1: 'value1' }
-  };
-  const apiRoot = parseApiResponseRootStructure(resData);
-  expect(apiRoot.isArray).toStrictEqual(false);
-  expect(apiRoot.children.length).toStrictEqual(1);
-  expect(apiRoot.children[0]).toMatchObject({
-    key: 'key1',
-    isArray: false,
-    parents: []
-  });
-  expect(apiRoot.children[0].children[0]).toMatchObject({
-    key: 'nestedKey1',
-    isArray: false,
-    children: []
-  });
-  expect(apiRoot.children[0].children[0].path[0]).toMatchObject({
-    key: 'key1',
-    isArray: false,
-    parents: []
-  });
+test('extract values', () => {
   expect(
-    getApiFieldData(resData, apiRoot.children[0].children[0], 0)
-  ).toStrictEqual('value1');
+    extractValuesFromRoot({
+      a: [1, 2],
+      b: 3
+    })
+  ).toStrictEqual({
+    a: [1, 2],
+    b: 3
+  });
+
+  expect(
+    extractValuesFromRoot({
+      a: [
+        {
+          b: [1, 2],
+          c: 6
+        },
+        {
+          b: [3, 4, 5],
+          c: 7
+        }
+      ]
+    })
+  ).toStrictEqual({
+    'a.b': [
+      [1, 2],
+      [3, 4, 5]
+    ],
+    'a.c': [6, 7]
+  });
+
+  expect(
+    extractValuesFromRoot({
+      a: [
+        {
+          b: [
+            {
+              c: [1, 2]
+            },
+            {
+              c: [3, 4]
+            }
+          ]
+        },
+        {
+          b: [
+            {
+              c: [5, 6]
+            },
+            {
+              c: [7, 8]
+            }
+          ]
+        }
+      ]
+    })
+  ).toStrictEqual({
+    'a.b.c': [
+      [
+        [1, 2],
+        [3, 4]
+      ],
+      [
+        [5, 6],
+        [7, 8]
+      ]
+    ]
+  });
 });

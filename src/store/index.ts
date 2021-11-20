@@ -2,10 +2,8 @@ import { createStore, Store, useStore as baseUseStore } from 'vuex';
 import axios, { AxiosResponse } from 'axios';
 import {
   Api,
-  ApiFieldStructure,
-  getApiFieldData,
-  getApiFieldLength,
-  parseApiResponseRootStructure
+  ApiStructure,
+  extractApiStructureFromRoot
 } from '../utils/apiUtils';
 import { InjectionKey } from 'vue';
 
@@ -17,7 +15,7 @@ export interface WysiComponent {
 export interface WysiMapping {
   compId: number;
   boxId: number;
-  apiField: ApiFieldStructure;
+  apiField: ApiStructure;
 }
 
 export interface State {
@@ -26,7 +24,7 @@ export interface State {
   compIdSeq: number;
   components: WysiComponent[];
   mappings: WysiMapping[];
-  draggedApiField?: ApiFieldStructure;
+  draggedApiField?: ApiStructure;
 }
 
 export const key: InjectionKey<Store<State>> = Symbol();
@@ -95,7 +93,7 @@ export const store = createStore<State>({
         loading: false,
         resData: res.data
       };
-      api.structure = parseApiResponseRootStructure(api);
+      api.structure = extractApiStructureFromRoot(api);
       state.apis[index] = api;
     },
     apiDataError(state, { id, error }: { id: number; error: string }) {
@@ -111,7 +109,7 @@ export const store = createStore<State>({
       const index = state.apis.findIndex(a => a.id === id);
       state.apis.splice(index, 1);
     },
-    dragApiField(state, payload: ApiFieldStructure) {
+    dragApiField(state, payload: ApiStructure) {
       state.draggedApiField = payload;
     },
     dropApiField(state, { compId, boxId }: { compId: number; boxId: number }) {
@@ -156,7 +154,7 @@ export const store = createStore<State>({
     deleteApi({ commit }, id: number) {
       commit('deleteApi', id);
     },
-    dragApiField({ commit }, payload: ApiFieldStructure) {
+    dragApiField({ commit }, payload: ApiStructure) {
       commit('dragApiField', payload);
     },
     dropApiField({ commit, state }, payload) {
