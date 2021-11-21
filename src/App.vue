@@ -23,12 +23,7 @@
       <wysi-component-drop-zone :index="components.length" />
     </div>
 
-    <div>
-      <api-add-input class="w-100 p-2 bg-gray-800" />
-      <div class="scrollable-container p-2 bg-gray-800">
-        <api-panel />
-      </div>
-    </div>
+    <api-panel></api-panel>
   </div>
 </template>
 
