@@ -3,6 +3,7 @@ import axios, { AxiosResponse } from 'axios';
 import {
   Api,
   ApiStructure,
+  ApiValue,
   extractApiStructureFromRoot
 } from '../utils/apiUtils';
 import { InjectionKey } from 'vue';
@@ -15,7 +16,9 @@ export interface WysiComponent {
 export interface WysiMapping {
   compId: number;
   boxId: number;
-  apiField: ApiStructure;
+  apiId: number;
+  path: string[];
+  value?: ApiValue;
 }
 
 export interface State {
@@ -46,37 +49,9 @@ export const store = createStore<State>({
     mappings: []
   },
   getters: {
-    getMappingValue:
-      state =>
-      (compId: number, compIndex: number, boxId: number): any => {
-        const mapping = state.mappings.find(
-          m => m.compId === compId && m.boxId === boxId
-        );
-        if (!mapping) {
-          return undefined;
-        }
-        const api = mapping.apiField.api;
-        if (!api) {
-          return undefined;
-        }
-        if (api.structure?.isArray) {
-          return getApiFieldData(
-            api.resData[compIndex],
-            mapping.apiField,
-            compIndex
-          );
-        }
-        return getApiFieldData(api.resData, mapping.apiField, compIndex);
-      },
-    getComponentCount:
-      state =>
-      (compId: number): number => {
-        const mappings = state.mappings.filter(m => m.compId === compId);
-        if (mappings.length) {
-          return Math.max(...mappings.map(m => getApiFieldLength(m.apiField)));
-        }
-        return 1;
-      }
+    getMappings: state => (compId: number) => {
+      return state.mappings.filter(m => m.compId === compId);
+    }
   },
   mutations: {
     incrementApiId(state) {
@@ -129,9 +104,7 @@ export const store = createStore<State>({
         state.mappings.push({
           compId,
           boxId,
-          apiField: {
-            ...state.draggedApiField
-          }
+          ...state.draggedApiField
         });
       }
     },

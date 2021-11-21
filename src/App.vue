@@ -3,7 +3,7 @@
     <div class="select-none bg-gray-800">
       <div
         class="m-2 p-2 bg-gray-600 rounded"
-        v-for="comp in Object.keys(componentMap)"
+        v-for="comp in Object.keys(wysiComponentMap)"
         draggable="true"
       >
         {{ comp }}
@@ -11,37 +11,28 @@
     </div>
 
     <div class="col-span-2 p-5 bg-gray-700 select-none">
-      <div v-for="comp in store.state.components" class="my-5">
-        <component
-          v-for="n in getComponentCount(comp.id)"
-          :is="componentMap[comp.template]"
-          :comp-id="comp.id"
-          :comp-index="n - 1"
-        ></component>
-      </div>
+      <wysi-component-renderer
+        v-for="comp in store.state.components"
+        :comp="comp"
+        :mappings="getMappings(comp.id)"
+        class="my-5"
+      />
     </div>
 
-    <ApiPanel />
+    <api-panel />
   </div>
 </template>
 
 <script lang="ts" setup>
 import ApiPanel from './components/ApiPanel/ApiPanel.vue';
-import WysiCard from './components/wysi-components/WysiCard.vue';
-import WysiParagraph from './components/wysi-components/WysiParagraph.vue';
-import WysiTitle from './components/wysi-components/WysiTitle.vue';
 import { onMounted } from 'vue';
 import { useStore } from './store';
+import WysiComponentRenderer from './components/WysiComponentRenderer.vue';
+import { wysiComponentMap } from './utils/wysiComponentMap';
 
 const store = useStore();
 
-const componentMap = {
-  'wysi-title': WysiTitle,
-  'wysi-paragraph': WysiParagraph,
-  'wysi-card': WysiCard
-};
-
-const getComponentCount = store.getters.getComponentCount;
+const getMappings = store.getters.getMappings
 
 onMounted(() => {
   store.dispatch(

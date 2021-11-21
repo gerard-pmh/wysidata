@@ -5,30 +5,30 @@
       draggable="true"
       @dragstart="handleDragApiField()"
     >
-      {{ apiField.key }}
+      {{ apiStruct.key }}
     </div>
 
-    <div v-if="apiField.children.length">
-      <div v-if="apiField.isArray">[</div>
+    <div v-if="apiStruct.fields.length">
+      <div v-if="apiStruct.isArray">[</div>
       <div class="ml-1">{</div>
-      <ApiField v-for="child in apiField.children" :api-field="child" />
+      <ApiField v-for="child in apiStruct.fields" :apiStruct='child' />
       <div class="ml-1">}</div>
-      <div v-if="apiField.isArray">]</div>
+      <div v-if="apiStruct.isArray">]</div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ApiFieldStructure } from '../../utils/apiUtils';
+import { ApiStructure } from '../../utils/apiUtils';
 import { useStore } from '../../store';
 
-const props = defineProps<{
-  apiField: ApiFieldStructure;
+const { apiStruct } = defineProps<{
+  apiStruct: ApiStructure;
 }>();
 
 const store = useStore();
 
 function handleDragApiField(): void {
-  store.dispatch('dragApiField', props.apiField);
+  store.dispatch('dragApiField', {});
 }
 </script>

@@ -15,6 +15,7 @@ export interface Api {
 }
 
 export interface ApiStructure {
+  apiId: number;
   key: string;
   path: string[];
   isArray: boolean;
@@ -22,24 +23,31 @@ export interface ApiStructure {
   value?: ApiValue;
 }
 
-export type ApiValue = MultiDimensionalArray<string | number | boolean | null>;
+export type ApiValue =
+  | MultiDimensionalArray<string | number | boolean | null>
+  | string
+  | number
+  | boolean
+  | null;
 
 export interface ApiValues {
   [key: string]: ApiValue;
 }
 
-export function extractApiStructureFromRoot(apiRootData: any) {
-  const apiLeafValues = extractValuesFromRoot(apiRootData);
+export function extractApiStructureFromRoot(api: Api) {
+  const apiLeafValues = extractValuesFromRoot(api.resData);
   return extractApiStructure(
-    apiRootData,
+    api.id,
+    api.resData,
     'root',
     [],
-    Array.isArray(apiRootData),
+    Array.isArray(api.resData),
     apiLeafValues
   );
 }
 
 function extractApiStructure(
+  apiId: number,
   data: any,
   key: string,
   path: string[],
@@ -49,6 +57,7 @@ function extractApiStructure(
   if (isNotObject(data)) {
     const value = apiLeafValues[path.join('.')];
     return {
+      apiId,
       key,
       path,
       isArray,
@@ -56,14 +65,22 @@ function extractApiStructure(
     };
   } else if (Array.isArray(data)) {
     if (data.length) {
-      return extractApiStructure(data[0], key, path, true, apiLeafValues);
+      return extractApiStructure(
+        apiId,
+        data[0],
+        key,
+        path,
+        true,
+        apiLeafValues
+      );
     }
-    return { key, path, isArray: true };
+    return { apiId, key, path, isArray: true };
   } else {
     const fields = Object.entries(data).map(([k, v]) =>
-      extractApiStructure(v, k, [...path, k], isArray, apiLeafValues)
+      extractApiStructure(apiId, v, k, [...path, k], false, apiLeafValues)
     );
     return {
+      apiId,
       key,
       path,
       isArray,

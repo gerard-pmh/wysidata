@@ -2,33 +2,33 @@
   <div class="bg-gray-500 rounded p-2 my-2">
     <h1>
       <ValueBox
-        default-value="Title"
+        placeholder-value="Title"
         :comp-id="compId"
-        :comp-index="compIndex"
+        :mappings="mappings"
         :box-id="1"
       ></ValueBox>
     </h1>
     <h2>
       <ValueBox
-        default-value="Subtitle"
+        placeholder-value="Subtitle"
         :comp-id="compId"
-        :comp-index="compIndex"
+        :mappings="mappings"
         :box-id="2"
       ></ValueBox>
     </h2>
     <p>
       <ValueBox
-        default-value="Content"
+        placeholder-value="Content"
         :comp-id="compId"
-        :comp-index="compIndex"
+        :mappings="mappings"
         :box-id="3"
       ></ValueBox>
     </p>
     <div>
       <ValueBox
-        default-value="Footer"
+        placeholder-value="Footer"
         :comp-id="compId"
-        :comp-index="compIndex"
+        :mappings="mappings"
         :box-id="4"
       ></ValueBox>
     </div>
@@ -37,9 +37,10 @@
 
 <script lang="ts" setup>
 import ValueBox from '../ValueBox.vue';
+import { WysiMapping } from '../../store';
 
-defineProps<{
+const { compId, mappings } = defineProps<{
   compId: number;
-  compIndex: number;
+  mappings: WysiMapping[];
 }>();
 </script>

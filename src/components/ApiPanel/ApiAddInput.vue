@@ -19,7 +19,7 @@
       />
     </div>
     <button
-      @click="emit('addApi', apiUrl)"
+      @click="handleAddApi()"
       class="
         px-2
         font-bold
@@ -37,11 +37,14 @@
 </template>
 
 <script lang="ts" setup>
+import { useStore } from '../../store';
 import { ref, Ref } from 'vue';
 
-const emit = defineEmits<{
-  (event: 'addApi', apiUrl: string): void;
-}>();
-
 const apiUrl: Ref<string> = ref('');
+
+const store = useStore();
+
+function handleAddApi(): void {
+  store.dispatch('addApi', apiUrl.value);
+}
 </script>

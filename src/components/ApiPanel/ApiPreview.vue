@@ -13,7 +13,7 @@
       <div class="ml-1">{</div>
       <ApiField
         v-for="apiField in api.structure.children"
-        :api-field="apiField"
+        :api-struct="apiField"
         :api-id="api.id"
       />
       <div class="ml-1">}</div>
@@ -22,7 +22,7 @@
 
     <div class="flex justify-end">
       <button
-        @click="emit('deleteApi', api.id)"
+        @click="handleDeleteApi()"
         class="bg-pink-900 text-pink-200 p-1 rounded"
       >
         delete
@@ -34,12 +34,15 @@
 <script lang="ts" setup>
 import { Api } from '../../utils/apiUtils';
 import ApiField from './ApiField.vue';
+import { useStore } from '../../store';
 
-defineProps<{
+const { api } = defineProps<{
   api: Api;
 }>();
 
-const emit = defineEmits<{
-  (event: 'deleteApi', apiId: number): void;
-}>();
+const store = useStore();
+
+function handleDeleteApi(): void {
+  store.dispatch('deleteApi', api.id);
+}
 </script>

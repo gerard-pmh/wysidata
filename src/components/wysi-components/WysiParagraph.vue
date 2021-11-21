@@ -1,9 +1,9 @@
 <template>
   <p>
     <ValueBox
-      :default-value="loremIpsum"
+      :placeholder-value="loremIpsum"
       :comp-id="compId"
-      :comp-index="compIndex"
+      :mappings="mappings"
       :box-id="1"
     ></ValueBox>
   </p>
@@ -11,10 +11,11 @@
 
 <script lang="ts" setup>
 import ValueBox from '../ValueBox.vue';
+import { WysiMapping } from '../../store';
 
-defineProps<{
+const { compId, mappings } = defineProps<{
   compId: number;
-  compIndex: number;
+  mappings: WysiMapping[];
 }>();
 
 const loremIpsum =
