@@ -3,7 +3,7 @@
     v-if='maxLength > 0'
     v-for='i of maxLength'
     :comp='comp'
-    :mappings='getSubMappings(i)'
+    :mappings='getSubMappings(i - 1)'
   />
   <component
     v-else

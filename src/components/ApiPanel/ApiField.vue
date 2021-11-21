@@ -22,13 +22,13 @@
 import { ApiStructure } from '../../utils/apiUtils';
 import { useStore } from '../../store';
 
-defineProps<{
+const props = defineProps<{
   apiStruct: ApiStructure;
 }>();
 
 const store = useStore();
 
 function handleDragApiField(): void {
-  store.dispatch('dragApiField', {});
+  store.dispatch('dragApiField', props.apiStruct);
 }
 </script>
