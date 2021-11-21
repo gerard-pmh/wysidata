@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen font-sans text-gray-50 grid grid-cols-4">
-    <div class="select-none bg-gray-800">
+  <div class="fixed grid grid-cols-4 font-sans text-gray-50">
+    <div class="scrollable-container select-none bg-gray-800">
       <div
         class="m-2 p-2 bg-gray-600 rounded"
         v-for="comp in Object.keys(wysiComponentMap)"
@@ -10,16 +10,25 @@
       </div>
     </div>
 
-    <div class="col-span-2 p-5 bg-gray-700 select-none">
-      <div v-for="comp in store.state.components" class="my-5">
+    <div class="scrollable-container col-span-2 p-5 bg-gray-700 select-none">
+      <div v-for="(comp, i) of components" class="my-5">
+        <wysi-component-drop-zone :index="i" />
+
         <wysi-component-renderer
           :comp="comp"
           :mappings="getMappings(comp.id)"
         />
       </div>
+
+      <wysi-component-drop-zone :index="components.length" />
     </div>
 
-    <api-panel />
+    <div>
+      <api-add-input class="w-100 p-2 bg-gray-800" />
+      <div class="scrollable-container p-2 bg-gray-800">
+        <api-panel />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -29,9 +38,12 @@ import { onMounted } from 'vue';
 import { useStore } from './store';
 import WysiComponentRenderer from './components/WysiComponentRenderer.vue';
 import { wysiComponentMap } from './utils/wysiComponentMap';
+import WysiComponentDropZone from './components/WysiComponentDropZone.vue';
+import ApiAddInput from './components/ApiPanel/ApiAddInput.vue';
 
 const store = useStore();
 
+const components = store.state.components;
 const getMappings = store.getters.getMappings;
 
 onMounted(() => {
@@ -45,3 +57,9 @@ onMounted(() => {
   );
 });
 </script>
+
+<style>
+.scrollable-container {
+  @apply min-h-screen max-h-screen overflow-auto;
+}
+</style>

@@ -1,16 +1,8 @@
 <template>
-  <div class="p-2 bg-gray-800">
-    <ApiAddInput />
-    <ApiPreview
-      v-for="api in apis"
-      :key="api.id"
-      :api="api"
-    />
-  </div>
+  <ApiPreview v-for='api in apis' :key='api.id' :api='api' />
 </template>
 
-<script lang="ts" setup>
-import ApiAddInput from './ApiAddInput.vue';
+<script lang='ts' setup>
 import ApiPreview from './ApiPreview.vue';
 import { useStore } from '../../store';
 
