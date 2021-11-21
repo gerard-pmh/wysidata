@@ -11,12 +11,12 @@
     </div>
 
     <div class="col-span-2 p-5 bg-gray-700 select-none">
-      <wysi-component-renderer
-        v-for="comp in store.state.components"
-        :comp="comp"
-        :mappings="getMappings(comp.id)"
-        class="my-5"
-      />
+      <div v-for="comp in store.state.components" class="my-5">
+        <wysi-component-renderer
+          :comp="comp"
+          :mappings="getMappings(comp.id)"
+        />
+      </div>
     </div>
 
     <api-panel />
@@ -32,7 +32,7 @@ import { wysiComponentMap } from './utils/wysiComponentMap';
 
 const store = useStore();
 
-const getMappings = store.getters.getMappings
+const getMappings = store.getters.getMappings;
 
 onMounted(() => {
   store.dispatch(
