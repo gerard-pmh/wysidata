@@ -12,9 +12,8 @@
       <div v-if="api.structure.isArray">[</div>
       <div class="ml-1">{</div>
       <ApiField
-        v-for="apiField in api.structure.children"
+        v-for="apiField in api.structure.fields"
         :api-struct="apiField"
-        :api-id="api.id"
       />
       <div class="ml-1">}</div>
       <div v-if="api.structure.isArray">]</div>
@@ -36,13 +35,13 @@ import { Api } from '../../utils/apiUtils';
 import ApiField from './ApiField.vue';
 import { useStore } from '../../store';
 
-const { api } = defineProps<{
+const props = defineProps<{
   api: Api;
 }>();
 
 const store = useStore();
 
 function handleDeleteApi(): void {
-  store.dispatch('deleteApi', api.id);
+  store.dispatch('deleteApi', props.api.id);
 }
 </script>

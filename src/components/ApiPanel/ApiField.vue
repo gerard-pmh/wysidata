@@ -8,7 +8,7 @@
       {{ apiStruct.key }}
     </div>
 
-    <div v-if="apiStruct.fields.length">
+    <div v-if="apiStruct.fields?.length">
       <div v-if="apiStruct.isArray">[</div>
       <div class="ml-1">{</div>
       <ApiField v-for="child in apiStruct.fields" :apiStruct='child' />
@@ -22,7 +22,7 @@
 import { ApiStructure } from '../../utils/apiUtils';
 import { useStore } from '../../store';
 
-const { apiStruct } = defineProps<{
+defineProps<{
   apiStruct: ApiStructure;
 }>();
 

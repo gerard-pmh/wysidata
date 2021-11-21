@@ -18,13 +18,13 @@ import { computed } from 'vue';
 import { WysiComponent, WysiMapping } from '../store';
 import { wysiComponentMap } from '../utils/wysiComponentMap';
 
-const { comp, mappings } = defineProps<{
+const props = defineProps<{
   comp: WysiComponent;
   mappings: WysiMapping[];
 }>();
 
 const maxLength = computed(() => {
-  const lengths = mappings
+  const lengths = props.mappings
     .map(m => m.value)
     .filter(Array.isArray)
     .map(a => a.length);
@@ -32,7 +32,7 @@ const maxLength = computed(() => {
 });
 
 function getSubMappings(i: number): WysiMapping[] {
-  return mappings.map(mapping => ({
+  return props.mappings.map(mapping => ({
     ...mapping,
     value: Array.isArray(mapping.value) ? mapping.value[i] : mapping.value
   }));

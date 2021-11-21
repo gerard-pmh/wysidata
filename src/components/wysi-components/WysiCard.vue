@@ -39,7 +39,7 @@
 import ValueBox from '../ValueBox.vue';
 import { WysiMapping } from '../../store';
 
-const { compId, mappings } = defineProps<{
+defineProps<{
   compId: number;
   mappings: WysiMapping[];
 }>();

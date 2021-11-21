@@ -14,7 +14,7 @@
 import { useStore, WysiMapping } from '../store';
 import { computed } from 'vue';
 
-const { compId, boxId, mappings, placeholderValue } = defineProps<{
+const props = defineProps<{
   compId: number;
   boxId: number;
   mappings?: WysiMapping[];
@@ -24,10 +24,11 @@ const { compId, boxId, mappings, placeholderValue } = defineProps<{
 const store = useStore();
 
 const mappedValue = computed(
-  () => mappings?.find(m => m.boxId === boxId)?.value
+  () => props.mappings?.find(m => m.boxId === props.boxId)?.value
 );
 
 function handleDrop(): void {
+  const { compId, boxId } = props;
   store.dispatch('dropApiField', { compId, boxId });
 }
 </script>
