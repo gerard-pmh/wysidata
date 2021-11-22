@@ -1,23 +1,29 @@
 <template>
   <div class="h-screen overflow-auto p-5 bg-gray-700 select-none">
-    <template v-for="(comp, i) of components">
-      <wysi-component-drop-zone :compIndex="i" class="relative z-10" />
+    <transition-group name="wysi-components">
+      <div
+        v-for="(comp, index) of components"
+        :key="comp.id"
+        class="wysi-components-item"
+      >
+        <wysi-component-drop-zone :compIndex="index" class="relative z-10" />
 
-      <div class="rendered-wrapper relative">
-        <button
-          class="delete-component-button"
-          @click="deleteComponent(comp.id)"
-        >
-          x
-        </button>
-        <div class="relative z-0">
-          <wysi-component-renderer
-            :comp="comp"
-            :mappings="getMappings(comp.id)"
-          />
+        <div class="rendered-wrapper relative">
+          <button
+            class="delete-component-button"
+            @click="deleteComponent(comp.id)"
+          >
+            x
+          </button>
+          <div class="relative z-0">
+            <wysi-component-renderer
+              :comp="comp"
+              :mappings="getMappings(comp.id)"
+            />
+          </div>
         </div>
       </div>
-    </template>
+    </transition-group>
 
     <wysi-component-drop-zone
       :compIndex="components.length"
@@ -56,5 +62,19 @@ function deleteComponent(compId: number) {
 }
 .rendered-wrapper:hover .delete-component-button {
   display: block;
+}
+
+.wysi-components-item {
+  transition: all 0.6s ease;
+}
+
+.wysi-components-enter-from,
+.wysi-components-leave-to {
+  opacity: 0;
+}
+
+.wysi-components-leave-active {
+  position: absolute;
+  display: none;
 }
 </style>
