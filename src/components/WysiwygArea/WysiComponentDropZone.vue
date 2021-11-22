@@ -8,9 +8,11 @@
     :class="{ 'pointer-events-none': !draggedComponent }"
   >
     <div
-      v-if="draggedComponent"
       class="drop-preview"
-      :class="{ 'drop-preview-dragover': isDraggedOver }"
+      :class="{
+        'drop-preview-highlight': draggedComponent,
+        'drop-preview-dragover': draggedComponent && isDraggedOver
+      }"
     ></div>
   </div>
 </template>
@@ -35,6 +37,10 @@ function handleDrop() {
 
 <style scoped>
 .drop-preview {
+  box-shadow: 0 0 0 0 aqua;
+  transition: box-shadow 0.15s;
+}
+.drop-preview-highlight {
   box-shadow: 0 0 4px 1px aqua;
 }
 .drop-preview-dragover {
