@@ -1,6 +1,17 @@
 <template>
   <div class="p-2 bg-gray-600 rounded my-2">
-    <div class="font-mono text-xs bg-gray-700 rounded p-1">
+    <div
+      class="
+        font-mono
+        text-xs
+        bg-gray-700
+        rounded
+        p-1
+        whitespace-nowrap
+        overflow-hidden
+      "
+      :title="api.url"
+    >
       {{ api.url }}
     </div>
 
@@ -8,7 +19,7 @@
 
     <div v-else-if="api.error">{{ api.error }}</div>
 
-    <div v-else class="select-none font-bold font-mono text-gray-300">
+    <div v-else class="select-none font-bold text-xs font-mono text-gray-300">
       <div v-if="api.structure.isArray">[</div>
       <div class="ml-1">{</div>
       <ApiField

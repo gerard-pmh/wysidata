@@ -1,8 +1,9 @@
 <template>
   <div class="ml-5">
     <div
-      class="my-2 p-1 bg-gray-700 rounded"
-      draggable="true"
+      class="my-1 p-1 rounded"
+      :class="{'bg-gray-800 text-white': !!apiStruct.value, 'bg-gray-700': !apiStruct.value}"
+      :draggable="!!apiStruct.value"
       @dragstart="handleDragStart()"
       @dragend="handleDragEnd()"
     >

@@ -4,12 +4,18 @@
       <wysi-component-drop-zone :compIndex="i" class="relative z-10" />
 
       <div class="rendered-wrapper relative">
-        <button class="delete-component-button" @click='deleteComponent(comp.id)'>x</button>
-        <wysi-component-renderer
-          :comp="comp"
-          :mappings="getMappings(comp.id)"
-          class="relative z-0"
-        />
+        <button
+          class="delete-component-button"
+          @click="deleteComponent(comp.id)"
+        >
+          x
+        </button>
+        <div class="relative z-0">
+          <wysi-component-renderer
+            :comp="comp"
+            :mappings="getMappings(comp.id)"
+          />
+        </div>
       </div>
     </template>
 
@@ -31,7 +37,7 @@ const components = store.state.components;
 const getMappings = store.getters.getMappings;
 
 function deleteComponent(compId: number) {
-  store.dispatch('deleteComponent', compId)
+  store.dispatch('deleteComponent', compId);
 }
 </script>
 
