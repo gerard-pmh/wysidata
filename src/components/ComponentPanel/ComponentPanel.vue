@@ -4,7 +4,8 @@
       class="m-2 p-2 bg-gray-600 rounded"
       v-for="comp in Object.keys(wysiComponentMap)"
       draggable="true"
-      @dragstart="handleDrag(comp)"
+      @dragstart="handleDragStart(comp)"
+      @dragend="handleDragEnd()"
     >
       {{ comp }}
     </div>
@@ -17,7 +18,11 @@ import { useStore } from '../../store';
 
 const store = useStore();
 
-function handleDrag(comp: string) {
+function handleDragStart(comp: string) {
   store.dispatch('dragComponent', comp);
+}
+
+function handleDragEnd() {
+  store.dispatch('dragEnd');
 }
 </script>

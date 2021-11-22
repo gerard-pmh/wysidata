@@ -47,7 +47,9 @@ export const store = createStore<State>({
       { id: 2, template: 'wysi-paragraph' },
       { id: 3, template: 'wysi-card' }
     ],
-    mappings: []
+    mappings: [],
+    draggedComponent: undefined,
+    draggedApiField: undefined
   },
   getters: {
     getMappings: state => (compId: number) => {
@@ -88,11 +90,11 @@ export const store = createStore<State>({
       const index = state.apis.findIndex(a => a.id === id);
       state.apis.splice(index, 1);
     },
-    dragComponent(state, payload: string) {
-      state.draggedComponent = payload;
+    dragComponent(state, draggedComponent: string) {
+      state.draggedComponent = draggedComponent;
     },
-    dragApiField(state, payload: ApiStructure) {
-      state.draggedApiField = payload;
+    dragApiField(state, draggedApiField: ApiStructure) {
+      state.draggedApiField = draggedApiField;
     },
     dropComponent(state, payload: number) {
       if (!state.draggedComponent) {
@@ -124,8 +126,10 @@ export const store = createStore<State>({
         });
       }
     },
-    endDrag(state) {
+    dragComponentEnd(state) {
       state.draggedComponent = undefined;
+    },
+    dragApiFieldEnd(state) {
       state.draggedApiField = undefined;
     }
   },
@@ -150,14 +154,16 @@ export const store = createStore<State>({
     dragApiField({ commit }, payload: ApiStructure) {
       commit('dragApiField', payload);
     },
+    dragEnd({ commit }) {
+      commit('dragComponentEnd');
+      commit('dragApiFieldEnd');
+    },
     dropComponent({ commit, state }, payload) {
       commit('incrementComponentId');
       commit('dropComponent', payload);
-      commit('endDrag');
     },
     dropApiField({ commit, state }, payload) {
       commit('dropApiField', payload);
-      commit('endDrag');
     }
   }
 });

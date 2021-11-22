@@ -3,7 +3,8 @@
     <div
       class="my-2 p-1 bg-gray-700 rounded"
       draggable="true"
-      @dragstart="handleDrag()"
+      @dragstart="handleDragStart()"
+      @dragend="handleDragEnd()"
     >
       {{ apiStruct.key }}
     </div>
@@ -11,7 +12,7 @@
     <div v-if="apiStruct.fields?.length">
       <div v-if="apiStruct.isArray">[</div>
       <div class="ml-1">{</div>
-      <ApiField v-for="child in apiStruct.fields" :apiStruct='child' />
+      <ApiField v-for="child in apiStruct.fields" :apiStruct="child" />
       <div class="ml-1">}</div>
       <div v-if="apiStruct.isArray">]</div>
     </div>
@@ -28,7 +29,11 @@ const props = defineProps<{
 
 const store = useStore();
 
-function handleDrag(): void {
+function handleDragStart(): void {
   store.dispatch('dragApiField', props.apiStruct);
+}
+
+function handleDragEnd(): void {
+  store.dispatch('dragEnd');
 }
 </script>
