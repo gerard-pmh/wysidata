@@ -41,12 +41,8 @@ export const store = createStore<State>({
   state: {
     apiIdSeq: 0,
     apis: [],
-    compIdSeq: 4,
-    components: [
-      { id: 1, template: 'wysi-title' },
-      { id: 2, template: 'wysi-paragraph' },
-      { id: 3, template: 'wysi-card' }
-    ],
+    compIdSeq: 0,
+    components: [],
     mappings: [],
     draggedComponent: undefined,
     draggedApiField: undefined
@@ -86,9 +82,21 @@ export const store = createStore<State>({
         error: error.toString()
       };
     },
-    deleteApi(state, id: number) {
-      const index = state.apis.findIndex(a => a.id === id);
+    deleteComponent(state, compId: number) {
+      const index = state.components.findIndex(c => c.id === compId);
+      state.components.splice(index, 1);
+    },
+    deleteApi(state, apiId: number) {
+      const index = state.apis.findIndex(a => a.id === apiId);
       state.apis.splice(index, 1);
+    },
+    deleteMappingsWithComp(state, compId: number) {
+      const index = state.mappings.findIndex(m => m.compId === compId);
+      state.mappings.splice(index, 1);
+    },
+    deleteMappingsWithApi(state, apiId: number) {
+      const index = state.mappings.findIndex(m => m.apiId === apiId);
+      state.mappings.splice(index, 1);
     },
     dragComponent(state, draggedComponent: string) {
       state.draggedComponent = draggedComponent;
@@ -145,8 +153,13 @@ export const store = createStore<State>({
         commit('apiDataError', { id, error });
       }
     },
-    deleteApi({ commit }, id: number) {
-      commit('deleteApi', id);
+    deleteComponent({ commit }, compId: number) {
+      commit('deleteMappingsWithComp', compId);
+      commit('deleteComponent', compId);
+    },
+    deleteApi({ commit }, apiId: number) {
+      commit('deleteMappingsWithApi', apiId);
+      commit('deleteApi', apiId);
     },
     dragComponent({ commit }, payload: WysiComponent) {
       commit('dragComponent', payload);
