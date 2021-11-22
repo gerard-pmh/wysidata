@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="h-screen flex flex-col">
     <api-add-input class="w-100 p-2 bg-gray-800" />
-    <div class="scrollable-container p-2 bg-gray-800">
+    <div class="overflow-auto p-2 bg-gray-800">
       <api-preview v-for="api of apis" :key="api.id" :api="api" />
     </div>
   </div>

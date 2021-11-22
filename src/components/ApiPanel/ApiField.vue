@@ -3,7 +3,7 @@
     <div
       class="my-2 p-1 bg-gray-700 rounded"
       draggable="true"
-      @dragstart="handleDragApiField()"
+      @dragstart="handleDrag()"
     >
       {{ apiStruct.key }}
     </div>
@@ -28,7 +28,7 @@ const props = defineProps<{
 
 const store = useStore();
 
-function handleDragApiField(): void {
+function handleDrag(): void {
   store.dispatch('dragApiField', props.apiStruct);
 }
 </script>

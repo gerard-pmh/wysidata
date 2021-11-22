@@ -15,8 +15,8 @@
 
 <script lang='ts' setup>
 import { computed } from 'vue';
-import { WysiComponent, WysiMapping } from '../store';
-import { wysiComponentMap } from '../utils/wysiComponentMap';
+import { WysiComponent, WysiMapping } from '../../store';
+import { wysiComponentMap } from '../../utils/wysiComponentMap';
 
 const props = defineProps<{
   comp: WysiComponent;

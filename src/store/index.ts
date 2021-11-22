@@ -27,6 +27,7 @@ export interface State {
   compIdSeq: number;
   components: WysiComponent[];
   mappings: WysiMapping[];
+  draggedComponent?: string;
   draggedApiField?: ApiStructure;
 }
 
@@ -54,6 +55,9 @@ export const store = createStore<State>({
     }
   },
   mutations: {
+    incrementComponentId(state) {
+      state.compIdSeq++;
+    },
     incrementApiId(state) {
       state.apiIdSeq++;
     },
@@ -84,8 +88,20 @@ export const store = createStore<State>({
       const index = state.apis.findIndex(a => a.id === id);
       state.apis.splice(index, 1);
     },
+    dragComponent(state, payload: string) {
+      state.draggedComponent = payload;
+    },
     dragApiField(state, payload: ApiStructure) {
       state.draggedApiField = payload;
+    },
+    dropComponent(state, payload: number) {
+      if (!state.draggedComponent) {
+        return;
+      }
+      state.components.splice(payload, 0, {
+        id: state.compIdSeq,
+        template: state.draggedComponent
+      });
     },
     dropApiField(state, { compId, boxId }: { compId: number; boxId: number }) {
       if (!state.draggedApiField) {
@@ -108,7 +124,8 @@ export const store = createStore<State>({
         });
       }
     },
-    endDragApiField(state) {
+    endDrag(state) {
+      state.draggedComponent = undefined;
       state.draggedApiField = undefined;
     }
   },
@@ -127,12 +144,20 @@ export const store = createStore<State>({
     deleteApi({ commit }, id: number) {
       commit('deleteApi', id);
     },
+    dragComponent({ commit }, payload: WysiComponent) {
+      commit('dragComponent', payload);
+    },
     dragApiField({ commit }, payload: ApiStructure) {
       commit('dragApiField', payload);
     },
+    dropComponent({ commit, state }, payload) {
+      commit('incrementComponentId');
+      commit('dropComponent', payload);
+      commit('endDrag');
+    },
     dropApiField({ commit, state }, payload) {
       commit('dropApiField', payload);
-      commit('endDragApiField');
+      commit('endDrag');
     }
   }
 });
