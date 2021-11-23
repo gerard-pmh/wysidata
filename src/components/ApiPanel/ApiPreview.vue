@@ -33,7 +33,7 @@
     <div class="flex justify-end">
       <button
         @click="handleDeleteApi()"
-        class="bg-pink-900 text-pink-200 p-1 rounded"
+        class="p-1 rounded bg-pink-900 text-pink-200 hover:bg-pink-800 hover:text-pink-100 transition-colors"
       >
         delete
       </button>

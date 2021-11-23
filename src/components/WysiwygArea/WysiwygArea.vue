@@ -13,7 +13,7 @@
             class="delete-component-button"
             @click="deleteComponent(comp.id)"
           >
-            x
+            X
           </button>
           <div class="relative z-0">
             <wysi-component-renderer
@@ -53,12 +53,15 @@ function deleteComponent(compId: number) {
   @apply absolute
   right-0
   z-20
-  bg-pink-700
+  py-1
+  px-2
+  -m-2
+  rounded-full
   text-xs
   font-bold
-  rounded
-  py-1
-  px-2;
+  bg-pink-900 text-pink-200
+  hover:bg-pink-800 hover:text-pink-100
+  transition-colors;
 }
 .rendered-wrapper:hover .delete-component-button {
   display: block;

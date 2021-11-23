@@ -13,13 +13,16 @@ export interface WysiComponent {
   template: string;
 }
 
-export interface WysiMapping {
+export interface WysiBoxMapping {
   compId: number;
   boxId: number;
+  value?: ApiValue;
+  highlighted?: boolean;
+}
+
+export interface WysiMapping extends WysiBoxMapping {
   apiId: number;
   path: string;
-  value?: ApiValue;
-  highlighted: boolean;
 }
 
 export interface State {
@@ -148,7 +151,7 @@ export const store = createStore<State>({
     dragApiFieldEnd(state) {
       state.draggedApiField = undefined;
     },
-    highlightMappingsFromValueBox(
+    highlightMappingsFromMappingBox(
       state,
       { compId, boxId }: { compId: number; boxId: number }
     ) {
@@ -207,10 +210,13 @@ export const store = createStore<State>({
     dropApiField({ commit }, payload) {
       commit('dropApiField', payload);
     },
-    valueBoxMouseEnter({ commit }, payload: { compId: number; boxId: number }) {
-      commit('highlightMappingsFromValueBox', payload);
+    mappingBoxMouseEnter(
+      { commit },
+      payload: { compId: number; boxId: number }
+    ) {
+      commit('highlightMappingsFromMappingBox', payload);
     },
-    valueBoxMouseLeave({ commit }) {
+    mappingBoxMouseLeave({ commit }) {
       commit('disableHighlightMappings');
     },
     apiFieldMouseEnter({ commit }, payload: { apiId: number; path: string }) {

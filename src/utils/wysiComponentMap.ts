@@ -1,6 +1,6 @@
-import WysiTitle from '../components/wysi-components/WysiTitle.vue';
-import WysiParagraph from '../components/wysi-components/WysiParagraph.vue';
-import WysiCard from '../components/wysi-components/WysiCard.vue';
+import WysiTitle from '../components/WysiComponents/WysiTitle.vue';
+import WysiParagraph from '../components/WysiComponents/WysiParagraph.vue';
+import WysiCard from '../components/WysiComponents/WysiCard.vue';
 
 export const wysiComponentMap = {
   'wysi-title': WysiTitle,
