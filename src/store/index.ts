@@ -17,8 +17,9 @@ export interface WysiMapping {
   compId: number;
   boxId: number;
   apiId: number;
-  path: string[];
+  path: string;
   value?: ApiValue;
+  highlighted: boolean;
 }
 
 export interface State {
@@ -50,6 +51,11 @@ export const store = createStore<State>({
   getters: {
     getMappings: state => (compId: number) => {
       return state.mappings.filter(m => m.compId === compId);
+    },
+    isApiFieldHighlighted: state => (apiId: number, apiPath: string) => {
+      return !!state.mappings.find(
+        m => m.highlighted && m.apiId === apiId && m.path === apiPath
+      );
     }
   },
   mutations: {
@@ -124,13 +130,15 @@ export const store = createStore<State>({
         const mapping = state.mappings[index];
         state.mappings[index] = {
           ...mapping,
-          ...state.draggedApiField
+          ...state.draggedApiField,
+          highlighted: false
         };
       } else {
         state.mappings.push({
           compId,
           boxId,
-          ...state.draggedApiField
+          ...state.draggedApiField,
+          highlighted: false
         });
       }
     },
@@ -139,6 +147,27 @@ export const store = createStore<State>({
     },
     dragApiFieldEnd(state) {
       state.draggedApiField = undefined;
+    },
+    highlightMappingsFromValueBox(
+      state,
+      { compId, boxId }: { compId: number; boxId: number }
+    ) {
+      state.mappings = state.mappings.map(m =>
+        m.compId === compId && m.boxId === boxId
+          ? { ...m, highlighted: true }
+          : m
+      );
+    },
+    highlightMappingsFromApiField(
+      state,
+      { apiId, path }: { apiId: number; path: string }
+    ) {
+      state.mappings = state.mappings.map(m =>
+        m.apiId === apiId && m.path === path ? { ...m, highlighted: true } : m
+      );
+    },
+    disableHighlightMappings(state) {
+      state.mappings = state.mappings.map(m => ({ ...m, highlighted: false }));
     }
   },
   actions: {
@@ -171,12 +200,24 @@ export const store = createStore<State>({
       commit('dragComponentEnd');
       commit('dragApiFieldEnd');
     },
-    dropComponent({ commit, state }, payload) {
+    dropComponent({ commit }, payload) {
       commit('incrementComponentId');
       commit('dropComponent', payload);
     },
-    dropApiField({ commit, state }, payload) {
+    dropApiField({ commit }, payload) {
       commit('dropApiField', payload);
+    },
+    valueBoxMouseEnter({ commit }, payload: { compId: number; boxId: number }) {
+      commit('highlightMappingsFromValueBox', payload);
+    },
+    valueBoxMouseLeave({ commit }) {
+      commit('disableHighlightMappings');
+    },
+    apiFieldMouseEnter({ commit }, payload: { apiId: number; path: string }) {
+      commit('highlightMappingsFromApiField', payload);
+    },
+    apiFieldMouseLeave({ commit }) {
+      commit('disableHighlightMappings');
     }
   }
 });

@@ -17,7 +17,8 @@ export interface Api {
 export interface ApiStructure {
   apiId: number;
   key: string;
-  path: string[];
+  // FIXME better path management
+  path: string;
   isArray: boolean;
   fields?: ApiStructure[];
   value?: ApiValue;
@@ -40,7 +41,7 @@ export function extractApiStructureFromRoot(api: Api) {
     api.id,
     api.resData,
     'root',
-    [],
+    '',
     Array.isArray(api.resData),
     apiLeafValues
   );
@@ -50,12 +51,12 @@ function extractApiStructure(
   apiId: number,
   data: any,
   key: string,
-  path: string[],
+  path: string,
   isArray: boolean,
   apiLeafValues: ApiValues
 ): ApiStructure {
   if (isNotObject(data)) {
-    const value = apiLeafValues[path.join('.')];
+    const value = apiLeafValues[path];
     return {
       apiId,
       key,
@@ -77,7 +78,7 @@ function extractApiStructure(
     return { apiId, key, path, isArray: true };
   } else {
     const fields = Object.entries(data).map(([k, v]) =>
-      extractApiStructure(apiId, v, k, [...path, k], false, apiLeafValues)
+      extractApiStructure(apiId, v, k, `${path}.${k}`, false, apiLeafValues)
     );
     return {
       apiId,
@@ -91,18 +92,18 @@ function extractApiStructure(
 
 export function extractValuesFromRoot(apiRootData: any): ApiValues {
   const accumulator: ApiValues = {};
-  extractValues(apiRootData, accumulator, [], []);
+  extractValues(apiRootData, accumulator, '', []);
   return accumulator;
 }
 
 function extractValues(
   data: any,
   accumulator: ApiValues,
-  keys: string[],
+  path: string,
   indexes: number[]
 ): void {
   if (isNotObject(data)) {
-    const strKey = keys.join('.');
+    const strKey = path;
     if (indexes.length) {
       const multiDimArray =
         accumulator[strKey] ?? emptyMultiDimensionalArray(indexes.length);
@@ -113,11 +114,11 @@ function extractValues(
     }
   } else if (Array.isArray(data)) {
     data.forEach((d, i) =>
-      extractValues(d, accumulator, keys, [...indexes, i])
+      extractValues(d, accumulator, path, [...indexes, i])
     );
   } else {
     Object.entries(data).forEach(([k, v]) => {
-      extractValues(v, accumulator, [...keys, k], indexes);
+      extractValues(v, accumulator, `${path}.${k}`, indexes);
     });
   }
 }

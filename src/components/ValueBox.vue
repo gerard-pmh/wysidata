@@ -4,14 +4,20 @@
     @dragover.prevent
     @dragenter="isDraggedOver = true"
     @dragleave="isDraggedOver = false"
+    @mouseenter="handleMouseEnter()"
+    @mouseleave="handleMouseLeave()"
     class="bg-gray-600 my-2 p-2 text-white rounded value-box"
     :class="{
-      'value-box-highlight': draggedApiField,
+      'value-box-highlight': draggedApiField || mapping?.highlighted,
       'value-box-dragover': draggedApiField && isDraggedOver
     }"
   >
-    <span v-if="mappedValue">{{ mappedValue }}</span>
-    <span v-else class="text-gray-200">{{ placeholderValue }}</span>
+    <span v-if="mapping?.value" class="pointer-events-none">{{
+      mapping?.value
+    }}</span>
+    <span v-else class="text-gray-200 pointer-events-none">{{
+      placeholderValue
+    }}</span>
   </div>
 </template>
 
@@ -28,8 +34,8 @@ const props = defineProps<{
 
 const store = useStore();
 
-const mappedValue = computed(
-  () => props.mappings?.find(m => m.boxId === props.boxId)?.value
+const mapping = computed(() =>
+  props.mappings?.find(m => m.boxId === props.boxId)
 );
 
 const draggedApiField = computed(() => store.state.draggedApiField);
@@ -40,12 +46,21 @@ function handleDrop(): void {
   const { compId, boxId } = props;
   store.dispatch('dropApiField', { compId, boxId });
 }
+
+function handleMouseEnter() {
+  const { compId, boxId } = props;
+  store.dispatch('valueBoxMouseEnter', { compId, boxId });
+}
+
+function handleMouseLeave() {
+  store.dispatch('valueBoxMouseLeave');
+}
 </script>
 
 <style scoped>
 .value-box {
   box-shadow: 0 0 0 0 aqua;
-  transition: box-shadow .15s;
+  transition: box-shadow 0.15s;
 }
 .value-box-highlight {
   box-shadow: 0 0 2px 1px aqua;
