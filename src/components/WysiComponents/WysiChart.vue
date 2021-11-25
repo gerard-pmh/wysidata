@@ -1,7 +1,11 @@
 <template>
   <div>
-    <mapping-box :mapping="getMapping(1, compId, mappings)">X</mapping-box>
-    <mapping-box :mapping="getMapping(2, compId, mappings)">Y</mapping-box>
+    <mapping-box :mapping-id="{ compId, boxId: 1 }" :mappings="mappings"
+      >X</mapping-box
+    >
+    <mapping-box :mapping-id="{ compId, boxId: 2 }" :mappings="mappings"
+      >Y</mapping-box
+    >
     <div ref="chartRef" />
   </div>
 </template>
@@ -9,9 +13,9 @@
 <script lang="ts" setup>
 import MappingBox from '../MappingBox.vue';
 import { WysiMapping } from '../../store';
-import { getMapping } from './shared';
 import { ref, watchEffect } from 'vue';
 import ApexCharts from 'apexcharts';
+import { findMapping } from '../../utils/mappingUtils';
 
 const props = defineProps<{
   compId: number;
@@ -24,13 +28,15 @@ let chart: ApexCharts;
 watchEffect(() => {
   console.log('called');
   const { compId, mappings } = props;
-  const xData = getMapping(1, compId, mappings)?.value;
-  const yData = getMapping(2, compId, mappings)?.value;
+  const xMapping = findMapping({ compId, boxId: 1 }, mappings);
+  const yMapping = findMapping({ compId, boxId: 2 }, mappings);
+  const xData = xMapping?.value;
+  const yData = yMapping?.value;
   if (xData && yData) {
     const options = {
       series: [
         {
-          name: 'Desktops',
+          name: yMapping.apiNodeId.path,
           data: yData
         }
       ],
@@ -47,15 +53,8 @@ watchEffect(() => {
       stroke: {
         curve: 'straight'
       },
-      title: {
-        text: 'Product Trends by Month',
-        align: 'left'
-      },
-      grid: {
-        row: {
-          colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-          opacity: 0.5
-        }
+      theme: {
+        mode: 'dark'
       },
       xaxis: {
         categories: xData

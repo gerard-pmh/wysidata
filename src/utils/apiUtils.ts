@@ -11,16 +11,19 @@ export interface Api {
   loading: boolean;
   error?: string;
   resData?: any;
-  structure?: ApiStructure;
+  structure?: ApiNode;
 }
 
-export interface ApiStructure {
+export interface ApiNodeId {
   apiId: number;
-  key: string;
-  // FIXME better path management
   path: string;
+}
+
+export interface ApiNode {
+  id: ApiNodeId;
+  name: string;
   isArray: boolean;
-  fields?: ApiStructure[];
+  nodes?: ApiNode[];
   value?: ApiValue;
 }
 
@@ -42,7 +45,7 @@ export function extractApiStructureFromRoot(api: Api) {
     api.id,
     api.resData,
     'root',
-    '',
+    [],
     Array.isArray(api.resData),
     apiLeafValues
   );
@@ -51,17 +54,17 @@ export function extractApiStructureFromRoot(api: Api) {
 function extractApiStructure(
   apiId: number,
   data: any,
-  key: string,
-  path: string,
+  name: string,
+  arrPath: string[],
   isArray: boolean,
   apiLeafValues: ApiValues
-): ApiStructure {
+): ApiNode {
+  const path = arrPath.join('.');
   if (isNotObject(data)) {
     const value = apiLeafValues[path];
     return {
-      apiId,
-      key,
-      path,
+      id: { apiId, path },
+      name,
       isArray,
       value
     };
@@ -70,56 +73,55 @@ function extractApiStructure(
       return extractApiStructure(
         apiId,
         data[0],
-        key,
-        path,
+        name,
+        arrPath,
         true,
         apiLeafValues
       );
     }
-    return { apiId, key, path, isArray: true };
+    return { id: { apiId, path }, name, isArray: true };
   } else {
-    const fields = Object.entries(data).map(([k, v]) =>
-      extractApiStructure(apiId, v, k, `${path}.${k}`, false, apiLeafValues)
+    const nodes = Object.entries(data).map(([k, v]) =>
+      extractApiStructure(apiId, v, k, [...arrPath, k], false, apiLeafValues)
     );
     return {
-      apiId,
-      key,
-      path,
+      id: { apiId, path },
+      name,
       isArray,
-      fields
+      nodes
     };
   }
 }
 
 export function extractValuesFromRoot(apiRootData: any): ApiValues {
   const accumulator: ApiValues = {};
-  extractValues(apiRootData, accumulator, '', []);
+  extractValues(apiRootData, accumulator, [], []);
   return accumulator;
 }
 
 function extractValues(
   data: any,
   accumulator: ApiValues,
-  path: string,
+  arrPath: string[],
   indexes: number[]
 ): void {
   if (isNotObject(data)) {
-    const strKey = path;
+    const path = arrPath.join('.');
     if (indexes.length) {
       const multiDimArray =
-        accumulator[strKey] ?? emptyMultiDimensionalArray(indexes.length);
+        accumulator[path] ?? emptyMultiDimensionalArray(indexes.length);
       multiDimensionalInsert(data, multiDimArray, indexes);
-      accumulator[strKey] = multiDimArray;
+      accumulator[path] = multiDimArray;
     } else {
-      accumulator[strKey] = data;
+      accumulator[path] = data;
     }
   } else if (Array.isArray(data)) {
     data.forEach((d, i) =>
-      extractValues(d, accumulator, path, [...indexes, i])
+      extractValues(d, accumulator, arrPath, [...indexes, i])
     );
   } else {
     Object.entries(data).forEach(([k, v]) => {
-      extractValues(v, accumulator, `${path}.${k}`, indexes);
+      extractValues(v, accumulator, [...arrPath, k], indexes);
     });
   }
 }

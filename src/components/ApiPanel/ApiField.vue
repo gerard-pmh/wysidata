@@ -1,51 +1,52 @@
 <template>
   <div class="ml-5">
     <div
-      class="my-1 p-1 rounded api-field"
+      class="my-1 p-1 rounded api-node"
       :class="{
-        'bg-gray-800 text-white': !!apiStruct.value,
-        'bg-gray-700': !apiStruct.value,
-        'api-field-highlight': isHighlighted
+        'bg-gray-800 text-white': !!apiNode.value,
+        'bg-gray-700': !apiNode.value,
+        'api-node-highlight': isHighlighted
       }"
-      :draggable="!!apiStruct.value"
+      :draggable="!!apiNode.value"
       @dragstart="handleDragStart()"
       @dragend="handleDragEnd()"
       @mouseenter="handleMouseEnter()"
       @mouseleave="handleMouseLeave()"
     >
-      {{ apiStruct.key }}
+      {{ apiNode.name }}
     </div>
 
-    <div v-if="apiStruct.fields?.length">
-      <div v-if="apiStruct.isArray">[</div>
+    <div v-if="apiNode.nodes?.length">
+      <div v-if="apiNode.isArray">[</div>
       <div class="ml-1">{</div>
-      <ApiField v-for="child in apiStruct.fields" :apiStruct="child" />
+      <ApiField
+        v-for="child in apiNode.nodes"
+        :apiNode="child"
+        :key="child.name"
+      />
       <div class="ml-1">}</div>
-      <div v-if="apiStruct.isArray">]</div>
+      <div v-if="apiNode.isArray">]</div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ApiStructure } from '../../utils/apiUtils';
+import { ApiNode } from '../../utils/apiUtils';
 import { useStore } from '../../store';
 import { computed } from 'vue';
 
 const props = defineProps<{
-  apiStruct: ApiStructure;
+  apiNode: ApiNode;
 }>();
 
 const store = useStore();
 
 const isHighlighted = computed(() =>
-  store.getters.isApiFieldHighlighted(
-    props.apiStruct.apiId,
-    props.apiStruct.path
-  )
+  store.getters.isApiFieldHighlighted(props.apiNode.id)
 );
 
 function handleDragStart(): void {
-  store.dispatch('dragApiField', props.apiStruct);
+  store.dispatch('dragApiField', props.apiNode);
 }
 
 function handleDragEnd(): void {
@@ -53,8 +54,7 @@ function handleDragEnd(): void {
 }
 
 function handleMouseEnter() {
-  const { apiId, path } = props.apiStruct;
-  store.dispatch('apiFieldMouseEnter', { apiId, path });
+  store.dispatch('apiFieldMouseEnter', props.apiNode.id);
 }
 
 function handleMouseLeave() {
@@ -63,11 +63,11 @@ function handleMouseLeave() {
 </script>
 
 <style scoped>
-.api-field {
+.api-node {
   transition: box-shadow 0.15s;
   box-shadow: 0 0 0 0 aqua;
 }
-.api-field-highlight {
+.api-node-highlight {
   box-shadow: 0 0 2px 1px aqua;
 }
 </style>

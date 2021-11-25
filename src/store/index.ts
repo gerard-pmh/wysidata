@@ -2,7 +2,8 @@ import { createStore, Store, useStore as baseUseStore } from 'vuex';
 import axios, { AxiosResponse } from 'axios';
 import {
   Api,
-  ApiStructure,
+  ApiNode,
+  ApiNodeId,
   ApiValue,
   extractApiStructureFromRoot
 } from '../utils/apiUtils';
@@ -13,16 +14,16 @@ export interface WysiComponent {
   template: string;
 }
 
-export interface WysiBoxMapping {
+export interface MappingId {
   compId: number;
   boxId: number;
-  value?: ApiValue;
-  highlighted?: boolean;
 }
 
-export interface WysiMapping extends WysiBoxMapping {
-  apiId: number;
-  path: string;
+export interface WysiMapping {
+  id: MappingId;
+  apiNodeId: ApiNodeId;
+  value?: ApiValue;
+  highlighted?: boolean;
 }
 
 export interface State {
@@ -32,7 +33,7 @@ export interface State {
   components: WysiComponent[];
   mappings: WysiMapping[];
   draggedComponent?: string;
-  draggedApiField?: ApiStructure;
+  draggedApiField?: ApiNode;
 }
 
 export const key: InjectionKey<Store<State>> = Symbol();
@@ -53,11 +54,14 @@ export const store = createStore<State>({
   },
   getters: {
     getMappings: state => (compId: number) => {
-      return state.mappings.filter(m => m.compId === compId);
+      return state.mappings.filter(m => m.id.compId === compId);
     },
-    isApiFieldHighlighted: state => (apiId: number, apiPath: string) => {
+    isApiFieldHighlighted: state => (apiNodeId: ApiNodeId) => {
       return !!state.mappings.find(
-        m => m.highlighted && m.apiId === apiId && m.path === apiPath
+        m =>
+          m.highlighted &&
+          m.apiNodeId.apiId === apiNodeId.apiId &&
+          m.apiNodeId.path === apiNodeId.path
       );
     }
   },
@@ -100,48 +104,47 @@ export const store = createStore<State>({
       state.apis.splice(index, 1);
     },
     deleteMappingsWithComp(state, compId: number) {
-      const index = state.mappings.findIndex(m => m.compId === compId);
+      const index = state.mappings.findIndex(m => m.id.compId === compId);
       state.mappings.splice(index, 1);
     },
     deleteMappingsWithApi(state, apiId: number) {
-      const index = state.mappings.findIndex(m => m.apiId === apiId);
+      const index = state.mappings.findIndex(m => m.apiNodeId.apiId === apiId);
       state.mappings.splice(index, 1);
     },
     dragComponent(state, draggedComponent: string) {
       state.draggedComponent = draggedComponent;
     },
-    dragApiField(state, draggedApiField: ApiStructure) {
+    dragApiField(state, draggedApiField: ApiNode) {
       state.draggedApiField = draggedApiField;
     },
-    dropComponent(state, payload: number) {
+    dropComponent(state, index: number) {
       if (!state.draggedComponent) {
         return;
       }
-      state.components.splice(payload, 0, {
+      state.components.splice(index, 0, {
         id: state.compIdSeq,
         template: state.draggedComponent
       });
     },
-    dropApiField(state, { compId, boxId }: { compId: number; boxId: number }) {
+    dropApiField(state, { compId, boxId }: MappingId) {
       if (!state.draggedApiField) {
         return;
       }
       const index = state.mappings.findIndex(
-        m => m.compId === compId && m.boxId === boxId
+        m => m.id.compId === compId && m.id.boxId === boxId
       );
       if (index > -1) {
         const mapping = state.mappings[index];
         state.mappings[index] = {
           ...mapping,
-          ...state.draggedApiField,
-          highlighted: false
+          apiNodeId: { ...state.draggedApiField.id },
+          value: state.draggedApiField.value
         };
       } else {
         state.mappings.push({
-          compId,
-          boxId,
-          ...state.draggedApiField,
-          highlighted: false
+          id: { compId, boxId },
+          apiNodeId: { ...state.draggedApiField.id },
+          value: state.draggedApiField.value
         });
       }
     },
@@ -151,22 +154,18 @@ export const store = createStore<State>({
     dragApiFieldEnd(state) {
       state.draggedApiField = undefined;
     },
-    highlightMappingsFromMappingBox(
-      state,
-      { compId, boxId }: { compId: number; boxId: number }
-    ) {
+    highlightMappingsFromMappingBox(state, { compId, boxId }: MappingId) {
       state.mappings = state.mappings.map(m =>
-        m.compId === compId && m.boxId === boxId
+        m.id.compId === compId && m.id.boxId === boxId
           ? { ...m, highlighted: true }
           : m
       );
     },
-    highlightMappingsFromApiField(
-      state,
-      { apiId, path }: { apiId: number; path: string }
-    ) {
+    highlightMappingsFromApiField(state, { apiId, path }: ApiNodeId) {
       state.mappings = state.mappings.map(m =>
-        m.apiId === apiId && m.path === path ? { ...m, highlighted: true } : m
+        m.apiNodeId.apiId === apiId && m.apiNodeId.path === path
+          ? { ...m, highlighted: true }
+          : m
       );
     },
     disableHighlightMappings(state) {
@@ -196,7 +195,7 @@ export const store = createStore<State>({
     dragComponent({ commit }, payload: WysiComponent) {
       commit('dragComponent', payload);
     },
-    dragApiField({ commit }, payload: ApiStructure) {
+    dragApiField({ commit }, payload: ApiNode) {
       commit('dragApiField', payload);
     },
     dragEnd({ commit }) {
@@ -210,16 +209,13 @@ export const store = createStore<State>({
     dropApiField({ commit }, payload) {
       commit('dropApiField', payload);
     },
-    mappingBoxMouseEnter(
-      { commit },
-      payload: { compId: number; boxId: number }
-    ) {
+    mappingBoxMouseEnter({ commit }, payload: MappingId) {
       commit('highlightMappingsFromMappingBox', payload);
     },
     mappingBoxMouseLeave({ commit }) {
       commit('disableHighlightMappings');
     },
-    apiFieldMouseEnter({ commit }, payload: { apiId: number; path: string }) {
+    apiFieldMouseEnter({ commit }, payload: ApiNodeId) {
       commit('highlightMappingsFromApiField', payload);
     },
     apiFieldMouseLeave({ commit }) {

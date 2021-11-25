@@ -3,6 +3,7 @@
     <div
       class="m-2 p-2 bg-gray-600 rounded"
       v-for="comp in Object.keys(wysiComponentMap)"
+      :key="comp"
       draggable="true"
       @dragstart="handleDragStart(comp)"
       @dragend="handleDragEnd()"

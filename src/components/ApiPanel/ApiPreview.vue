@@ -23,8 +23,9 @@
       <div v-if="api.structure.isArray">[</div>
       <div class="ml-1">{</div>
       <ApiField
-        v-for="apiField in api.structure.fields"
-        :api-struct="apiField"
+        v-for="apiNode in api.structure.nodes"
+        :api-node="apiNode"
+        :key="apiNode.name"
       />
       <div class="ml-1">}</div>
       <div v-if="api.structure.isArray">]</div>
@@ -33,7 +34,14 @@
     <div class="flex justify-end">
       <button
         @click="handleDeleteApi()"
-        class="p-1 rounded bg-pink-900 text-pink-200 hover:bg-pink-800 hover:text-pink-100 transition-colors"
+        class="
+          p-1
+          rounded
+          bg-pink-900
+          text-pink-200
+          hover:bg-pink-800 hover:text-pink-100
+          transition-colors
+        "
       >
         delete
       </button>

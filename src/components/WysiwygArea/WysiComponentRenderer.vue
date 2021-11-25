@@ -2,6 +2,7 @@
   <wysi-component-renderer
     v-if="!stopNesting"
     v-for="i of maxLength"
+    :key="i"
     :comp="comp"
     :mappings="subMappings[i - 1]"
   />

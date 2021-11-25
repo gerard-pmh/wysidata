@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed grid grid-cols-4 font-sans text-gray-50">
+  <div class="fixed w-full grid grid-cols-4 font-sans text-gray-50">
     <component-panel />
 
     <wysiwyg-area class="col-span-2" />

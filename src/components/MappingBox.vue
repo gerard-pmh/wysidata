@@ -8,36 +8,40 @@
     @mouseleave="handleMouseLeave()"
     class="mapping-box rounded"
     :class="{
-      'mapping-box-highlight': draggedApiField || mapping.highlighted,
+      'mapping-box-highlight': draggedApiField || mapping?.highlighted,
       'mapping-box-dragover': draggedApiField && isDraggedOver
     }"
   >
-    <template v-if="mapping.value">{{ mapping.value }}</template>
+    <template v-if="mapping?.value">{{ mapping?.value }}</template>
     <!-- placeholder -->
     <slot v-else></slot>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { useStore, WysiBoxMapping } from '../store';
+import { MappingId, useStore, WysiMapping } from '../store';
 import { computed, ref } from 'vue';
+import { findMapping } from '../utils/mappingUtils';
 
 const props = defineProps<{
-  mapping: WysiBoxMapping;
+  mappingId: MappingId;
+  mappings: WysiMapping[];
 }>();
 
 const store = useStore();
+
+const mapping = computed(() => findMapping(props.mappingId, props.mappings));
 
 const draggedApiField = computed(() => store.state.draggedApiField);
 
 const isDraggedOver = ref(false);
 
 function handleDrop(): void {
-  store.dispatch('dropApiField', props.mapping);
+  store.dispatch('dropApiField', props.mappingId);
 }
 
 function handleMouseEnter() {
-  store.dispatch('mappingBoxMouseEnter', props.mapping);
+  store.dispatch('mappingBoxMouseEnter', props.mappingId);
 }
 
 function handleMouseLeave() {
