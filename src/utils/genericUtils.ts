@@ -37,3 +37,7 @@ export function emptyMultiDimensionalArray<T>(
   }
   return multiDimArray;
 }
+
+export function isOneDimensionalArray<T>(array: MultiDimensionalArray<T> | T) {
+  return Array.isArray(array) && array.every(v => !Array.isArray(v));
+}

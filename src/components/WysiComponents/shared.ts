@@ -1,10 +1,10 @@
-import { WysiMapping } from '../../store';
+import { WysiBoxMapping, WysiMapping } from '../../store';
 
 export function getMapping(
   boxId: number,
   compId: number,
   mappings: WysiMapping[]
-) {
+): WysiMapping | WysiBoxMapping {
   return (
     mappings.find(m => m.boxId === boxId && m.compId === compId) ?? {
       boxId,

@@ -25,11 +25,12 @@ export interface ApiStructure {
 }
 
 export type ApiValue =
-  | MultiDimensionalArray<string | number | boolean | null>
+  | MultiDimensionalArray<string | number | boolean | null | undefined>
   | string
   | number
   | boolean
-  | null;
+  | null
+  | undefined;
 
 export interface ApiValues {
   [key: string]: ApiValue;

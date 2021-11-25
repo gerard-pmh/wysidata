@@ -63,6 +63,7 @@ function deleteComponent(compId: number) {
   hover:bg-pink-800 hover:text-pink-100
   transition-colors;
 }
+
 .rendered-wrapper:hover .delete-component-button {
   display: block;
 }
