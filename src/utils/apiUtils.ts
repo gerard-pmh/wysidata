@@ -40,13 +40,13 @@ export interface ApiValues {
   [key: string]: ApiValue;
 }
 
-export function mapNodes(
+export function mapApiNodes(
   apiNode: ApiNode,
   mapFunc: (apiNode: ApiNode) => ApiNode
 ): ApiNode {
   return {
     ...mapFunc(apiNode),
-    nodes: apiNode.nodes?.map(n => mapNodes(n, mapFunc))
+    nodes: apiNode.nodes?.map(n => mapApiNodes(n, mapFunc))
   };
 }
 

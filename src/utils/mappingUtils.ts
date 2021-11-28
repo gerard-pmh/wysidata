@@ -1,4 +1,16 @@
-import { MappingId, WysiMapping } from '../store';
+import { ApiNodeId, ApiValue } from './apiUtils';
+
+export interface MappingId {
+  compId: number;
+  boxId: number;
+}
+
+export interface WysiMapping {
+  id: MappingId;
+  apiNodeId: ApiNodeId;
+  value?: ApiValue;
+  highlighted?: boolean;
+}
 
 export function findMapping(
   id: MappingId,

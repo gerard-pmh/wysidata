@@ -1,30 +1,18 @@
+import { InjectionKey } from 'vue';
 import { createStore, Store, useStore as baseUseStore } from 'vuex';
 import axios, { AxiosResponse } from 'axios';
 import {
   Api,
   ApiNode,
   ApiNodeId,
-  ApiValue,
   extractApiStructureFromRoot,
-  mapNodes
+  mapApiNodes
 } from '../utils/apiUtils';
-import { InjectionKey } from 'vue';
+import { MappingId, WysiMapping } from '../utils/mappingUtils';
 
 export interface WysiComponent {
   id: number;
   template: string;
-}
-
-export interface MappingId {
-  compId: number;
-  boxId: number;
-}
-
-export interface WysiMapping {
-  id: MappingId;
-  apiNodeId: ApiNodeId;
-  value?: ApiValue;
-  highlighted?: boolean;
 }
 
 export interface State {
@@ -157,7 +145,7 @@ export const store = createStore<State>({
         if (api.structure) {
           state.apis[index] = {
             ...api,
-            structure: mapNodes(api.structure, n =>
+            structure: mapApiNodes(api.structure, n =>
               n.id.path === apiNodeId.path
                 ? {
                     ...n,
@@ -181,7 +169,7 @@ export const store = createStore<State>({
         api.structure
           ? {
               ...api,
-              structure: mapNodes(api.structure, n => ({
+              structure: mapApiNodes(api.structure, n => ({
                 ...n,
                 highlighted: false
               }))
