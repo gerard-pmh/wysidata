@@ -11,8 +11,9 @@
 import ApiPreview from './ApiPreview.vue';
 import ApiAddInput from './ApiAddInput.vue';
 import { useStore } from '../../store';
+import { computed } from 'vue';
 
 const store = useStore();
 
-const apis = store.state.apis;
+const apis = computed(() => store.state.apis);
 </script>

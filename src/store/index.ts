@@ -5,7 +5,8 @@ import {
   ApiNode,
   ApiNodeId,
   ApiValue,
-  extractApiStructureFromRoot
+  extractApiStructureFromRoot,
+  mapNodes
 } from '../utils/apiUtils';
 import { InjectionKey } from 'vue';
 
@@ -55,14 +56,6 @@ export const store = createStore<State>({
   getters: {
     getMappings: state => (compId: number) => {
       return state.mappings.filter(m => m.id.compId === compId);
-    },
-    isApiFieldHighlighted: state => (apiNodeId: ApiNodeId) => {
-      return !!state.mappings.find(
-        m =>
-          m.highlighted &&
-          m.apiNodeId.apiId === apiNodeId.apiId &&
-          m.apiNodeId.path === apiNodeId.path
-      );
     }
   },
   mutations: {
@@ -154,21 +147,49 @@ export const store = createStore<State>({
     dragApiFieldEnd(state) {
       state.draggedApiField = undefined;
     },
-    highlightMappingsFromMappingBox(state, { compId, boxId }: MappingId) {
-      state.mappings = state.mappings.map(m =>
-        m.id.compId === compId && m.id.boxId === boxId
-          ? { ...m, highlighted: true }
-          : m
-      );
+    highlightApiNodes(state, { compId, boxId }: MappingId) {
+      const apiNodeId = state.mappings.find(
+        m => m.id.compId === compId && m.id.boxId === boxId
+      )?.apiNodeId;
+      if (apiNodeId) {
+        const index = state.apis.findIndex(a => a.id === apiNodeId.apiId);
+        const api = state.apis[index];
+        if (api.structure) {
+          state.apis[index] = {
+            ...api,
+            structure: mapNodes(api.structure, n =>
+              n.id.path === apiNodeId.path
+                ? {
+                    ...n,
+                    highlighted: true
+                  }
+                : n
+            )
+          };
+        }
+      }
     },
-    highlightMappingsFromApiField(state, { apiId, path }: ApiNodeId) {
+    highlightMappingBoxes(state, { apiId, path }: ApiNodeId) {
       state.mappings = state.mappings.map(m =>
         m.apiNodeId.apiId === apiId && m.apiNodeId.path === path
           ? { ...m, highlighted: true }
           : m
       );
     },
-    disableHighlightMappings(state) {
+    disableHighlightApiNodes(state) {
+      state.apis = state.apis.map(api =>
+        api.structure
+          ? {
+              ...api,
+              structure: mapNodes(api.structure, n => ({
+                ...n,
+                highlighted: false
+              }))
+            }
+          : api
+      );
+    },
+    disableHighlightMappingBoxes(state) {
       state.mappings = state.mappings.map(m => ({ ...m, highlighted: false }));
     }
   },
@@ -210,16 +231,16 @@ export const store = createStore<State>({
       commit('dropApiField', payload);
     },
     mappingBoxMouseEnter({ commit }, payload: MappingId) {
-      commit('highlightMappingsFromMappingBox', payload);
+      commit('highlightApiNodes', payload);
     },
     mappingBoxMouseLeave({ commit }) {
-      commit('disableHighlightMappings');
+      commit('disableHighlightApiNodes');
     },
     apiFieldMouseEnter({ commit }, payload: ApiNodeId) {
-      commit('highlightMappingsFromApiField', payload);
+      commit('highlightMappingBoxes', payload);
     },
     apiFieldMouseLeave({ commit }) {
-      commit('disableHighlightMappings');
+      commit('disableHighlightMappingBoxes');
     }
   }
 });

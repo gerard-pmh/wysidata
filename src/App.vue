@@ -20,10 +20,6 @@ const store = useStore();
 onMounted(() => {
   store.dispatch(
     'addApi',
-    'https://my-json-server.typicode.com/typicode/demo/comments'
-  );
-  store.dispatch(
-    'addApi',
     'https://api.themoviedb.org/3/search/movie?query=star&api_key=1bfe018b8cc0679115b416563dee86bc'
   );
 });

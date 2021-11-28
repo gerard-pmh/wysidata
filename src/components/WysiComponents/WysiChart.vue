@@ -1,12 +1,26 @@
 <template>
   <div>
-    <mapping-box :mapping-id="{ compId, boxId: 1 }" :mappings="mappings"
-      >X</mapping-box
-    >
-    <mapping-box :mapping-id="{ compId, boxId: 2 }" :mappings="mappings"
-      >Y</mapping-box
-    >
     <div ref="chartRef" />
+    <div class="absolute top-0 left-10 top-10 w-1/2">
+      <mapping-box
+        :mapping-id="{ compId, boxId: 1 }"
+        :mappings="mappings"
+        :hide-when-not-dragging="chartRendered"
+        :hide-values="true"
+        class="p-2 m-2 border bg-indigo-900"
+      >
+        X
+      </mapping-box>
+      <mapping-box
+        :mapping-id="{ compId, boxId: 2 }"
+        :mappings="mappings"
+        :hide-when-not-dragging="chartRendered"
+        :hide-values="true"
+        class="p-2 m-2 border bg-indigo-900"
+      >
+        Y
+      </mapping-box>
+    </div>
   </div>
 </template>
 
@@ -25,6 +39,8 @@ const props = defineProps<{
 const chartRef = ref();
 let chart: ApexCharts;
 
+const chartRendered = ref(false);
+
 watchEffect(() => {
   console.log('called');
   const { compId, mappings } = props;
@@ -41,7 +57,7 @@ watchEffect(() => {
         }
       ],
       chart: {
-        height: 350,
+        height: 400,
         type: 'line',
         zoom: {
           enabled: false
@@ -66,6 +82,7 @@ watchEffect(() => {
     } else {
       chart = new ApexCharts(chartRef.value, options);
       chart.render();
+      chartRendered.value = true;
     }
   }
 });

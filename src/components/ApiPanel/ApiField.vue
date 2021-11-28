@@ -5,7 +5,7 @@
       :class="{
         'bg-gray-800 text-white': !!apiNode.value,
         'bg-gray-700': !apiNode.value,
-        'api-node-highlight': isHighlighted
+        'api-node-highlight': apiNode.highlighted
       }"
       :draggable="!!apiNode.value"
       @dragstart="handleDragStart()"
@@ -33,17 +33,12 @@
 <script lang="ts" setup>
 import { ApiNode } from '../../utils/apiUtils';
 import { useStore } from '../../store';
-import { computed } from 'vue';
 
 const props = defineProps<{
   apiNode: ApiNode;
 }>();
 
 const store = useStore();
-
-const isHighlighted = computed(() =>
-  store.getters.isApiFieldHighlighted(props.apiNode.id)
-);
 
 function handleDragStart(): void {
   store.dispatch('dragApiField', props.apiNode);

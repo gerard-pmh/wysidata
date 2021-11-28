@@ -25,6 +25,7 @@ export interface ApiNode {
   isArray: boolean;
   nodes?: ApiNode[];
   value?: ApiValue;
+  highlighted?: boolean;
 }
 
 export type ApiValue =
@@ -37,6 +38,16 @@ export type ApiValue =
 
 export interface ApiValues {
   [key: string]: ApiValue;
+}
+
+export function mapNodes(
+  apiNode: ApiNode,
+  mapFunc: (apiNode: ApiNode) => ApiNode
+): ApiNode {
+  return {
+    ...mapFunc(apiNode),
+    nodes: apiNode.nodes?.map(n => mapNodes(n, mapFunc))
+  };
 }
 
 export function extractApiStructureFromRoot(api: Api) {
