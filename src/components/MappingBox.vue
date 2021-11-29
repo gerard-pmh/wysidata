@@ -1,6 +1,5 @@
 <template>
   <div
-    v-if="!hideWhenNotDragging || draggedApiField"
     @drop="handleDrop()"
     @dragover.prevent
     @dragenter="isDraggedOver = true"
@@ -13,24 +12,27 @@
       'mapping-box-dragover': draggedApiField && isDraggedOver
     }"
   >
-    <template v-if="!hideValues && mapping?.value">
+
+    <template v-if="showApiPath && mapping?.apiNodeId.path">
+      {{ mapping?.apiNodeId.path }}
+    </template>
+    <template v-else-if="mapping?.value">
       {{ mapping?.value }}
     </template>
     <!-- placeholder -->
-    <slot v-if="hideValues || !mapping?.value"></slot>
+    <slot v-else></slot>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { MappingId, useStore, WysiMapping } from '../store';
 import { computed, ref } from 'vue';
-import { findMapping } from '../utils/mappingUtils';
+import { findMapping, MappingId, WysiMapping } from '../utils/mappingUtils';
+import { useStore } from '../store';
 
 const props = defineProps<{
   mappingId: MappingId;
   mappings: WysiMapping[];
-  hideWhenNotDragging?: boolean;
-  hideValues?: boolean;
+  showApiPath?: boolean;
 }>();
 
 const store = useStore();
