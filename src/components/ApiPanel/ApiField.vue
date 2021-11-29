@@ -49,11 +49,13 @@ function handleDragEnd(): void {
 }
 
 function handleMouseEnter() {
-  store.dispatch('apiFieldMouseEnter', props.apiNode.id);
+  // FIXME heavy performance cost
+  // store.dispatch('apiFieldMouseEnter', props.apiNode.id);
 }
 
 function handleMouseLeave() {
-  store.dispatch('apiFieldMouseLeave');
+  // FIXME heavy performance cost
+  // store.dispatch('apiFieldMouseLeave');
 }
 </script>
 

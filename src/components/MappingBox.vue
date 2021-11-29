@@ -12,7 +12,6 @@
       'mapping-box-dragover': draggedApiField && isDraggedOver
     }"
   >
-
     <template v-if="showApiPath && mapping?.apiNodeId.path">
       {{ mapping?.apiNodeId.path }}
     </template>
@@ -48,11 +47,15 @@ function handleDrop(): void {
 }
 
 function handleMouseEnter() {
-  store.dispatch('mappingBoxMouseEnter', props.mappingId);
+  if (!draggedApiField) {
+    store.dispatch('mappingBoxMouseEnter', props.mappingId);
+  }
 }
 
 function handleMouseLeave() {
-  store.dispatch('mappingBoxMouseLeave');
+  if (!draggedApiField) {
+    store.dispatch('mappingBoxMouseLeave');
+  }
 }
 </script>
 
