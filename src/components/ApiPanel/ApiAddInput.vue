@@ -46,5 +46,6 @@ const store = useStore();
 
 function handleAddApi(): void {
   store.dispatch('addApi', apiUrl.value);
+  apiUrl.value = '';
 }
 </script>
