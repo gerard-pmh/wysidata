@@ -2,24 +2,34 @@ import WysiTitle from '../components/WysiComponents/WysiTitle.vue';
 import WysiParagraph from '../components/WysiComponents/WysiParagraph.vue';
 import WysiCard from '../components/WysiComponents/WysiCard.vue';
 import WysiChart from '../components/WysiComponents/WysiChart.vue';
+import WysiMap from '../components/WysiComponents/WysiMap.vue';
+
+export type WysiDataType = 'singleValue' | 'array' | 'arrayWithCoordinates';
 
 export const wysiComponentMap: {
   [key: string]: {
     vueComponent: any;
-    consumeArray?: boolean;
+    dataType: WysiDataType;
   };
 } = {
   'wysi-title': {
-    vueComponent: WysiTitle
+    vueComponent: WysiTitle,
+    dataType: 'singleValue'
   },
   'wysi-paragraph': {
-    vueComponent: WysiParagraph
+    vueComponent: WysiParagraph,
+    dataType: 'singleValue'
   },
   'wysi-card': {
-    vueComponent: WysiCard
+    vueComponent: WysiCard,
+    dataType: 'singleValue'
   },
   'wysi-chart': {
     vueComponent: WysiChart,
-    consumeArray: true
+    dataType: 'array'
+  },
+  'wysi-map': {
+    vueComponent: WysiMap,
+    dataType: 'arrayWithCoordinates'
   }
 };

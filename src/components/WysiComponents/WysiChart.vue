@@ -51,7 +51,6 @@ let chart: ApexCharts;
 const chartRendered = ref(false);
 
 watchEffect(() => {
-  console.log('called');
   const { compId, mappings } = props;
   const xMapping = findMapping({ compId, boxId: 1 }, mappings);
   const yMapping = findMapping({ compId, boxId: 2 }, mappings);

@@ -41,3 +41,19 @@ export function emptyMultiDimensionalArray<T>(
 export function isOneDimensionalArray<T>(array: MultiDimensionalArray<T> | T) {
   return Array.isArray(array) && array.every(v => !Array.isArray(v));
 }
+
+export function isNDimensionalArray<T>(
+  array: MultiDimensionalArray<T> | T,
+  n: number
+): boolean {
+  if (n < 2) {
+    return isOneDimensionalArray(array);
+  }
+  return (
+    Array.isArray(array) && array.every(v => isNDimensionalArray(v, n - 1))
+  );
+}
+
+export function isCoordinates<T>(array: MultiDimensionalArray<T>): boolean {
+  return isOneDimensionalArray(array) && array.length === 2;
+}

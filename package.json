@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",
+    "@types/leaflet": "^1.7.6",
     "@vitejs/plugin-vue": "^1.9.2",
     "autoprefixer": "^10.3.7",
     "jest": "^27.3.1",

@@ -16,10 +16,15 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { WysiComponent, WysiMapping } from '../../store';
-import { wysiComponentMap } from '../../utils/wysiComponentMap';
+import { WysiComponent } from '../../store';
+import { wysiComponentMap, WysiDataType } from '../../utils/wysiComponentMap';
 import { ApiValue } from '../../utils/apiUtils';
-import { isOneDimensionalArray } from '../../utils/genericUtils';
+import {
+  isNDimensionalArray,
+  isOneDimensionalArray,
+  isCoordinates
+} from '../../utils/genericUtils';
+import { WysiMapping } from '../../utils/mappingUtils';
 
 const props = defineProps<{
   comp: WysiComponent;
@@ -34,26 +39,22 @@ const maxLength = computed(() => {
   return lengths.length ? Math.max(...lengths) : 0;
 });
 
-const consumeArray = computed(
-  () => wysiComponentMap[props.comp.template].consumeArray
-);
+const dataType = computed(() => wysiComponentMap[props.comp.template].dataType);
 
 const subMappings = computed(() => {
   return [...Array(maxLength.value).keys()].map(i =>
-    props.mappings.map(m => ({
-      ...m,
-      value: consumeArray.value
-        ? getArraySubMapping(m.value, i)
-        : getSingleValueSubMapping(m.value, i)
-    }))
+    props.mappings.map(m => {
+      return {
+        ...m,
+        value: getMappingCases[dataType.value](m.value, i)
+      };
+    })
   );
 });
 
-const stopNesting = computed(() => {
-  return props.mappings.every(({ value }) =>
-    consumeArray.value ? isOneDimensionalArray(value) : !Array.isArray(value)
-  );
-});
+const stopNesting = computed(() =>
+  props.mappings.every(({ value }) => stopNestingCases[dataType.value](value))
+);
 
 function getSingleValueSubMapping(value: ApiValue, i: number): ApiValue {
   return Array.isArray(value) ? value[i] : value;
@@ -70,4 +71,41 @@ function getArraySubMapping(value: ApiValue, i: number): ApiValue {
     return [value];
   }
 }
+
+function getArraySubMappingWithCoordinates(
+  value: ApiValue,
+  i: number
+): ApiValue {
+  if (Array.isArray(value)) {
+    const subValue = value[i];
+    if (Array.isArray(subValue)) {
+      if (isCoordinates(subValue)) {
+        return value;
+      } else {
+        return value[i];
+      }
+    } else {
+      return value;
+    }
+  } else {
+    return [value];
+  }
+}
+
+const stopNestingCases: Record<WysiDataType, (v: ApiValue) => boolean> = {
+  singleValue: value => !Array.isArray(value),
+  array: value => isOneDimensionalArray(value),
+  arrayWithCoordinates: value =>
+    (isNDimensionalArray(value, 2) && (value as any[])?.every(isCoordinates)) ||
+    isOneDimensionalArray(value)
+};
+
+const getMappingCases: Record<
+  WysiDataType,
+  (v: ApiValue, i: number) => ApiValue
+> = {
+  singleValue: getSingleValueSubMapping,
+  array: getArraySubMapping,
+  arrayWithCoordinates: getArraySubMappingWithCoordinates
+};
 </script>

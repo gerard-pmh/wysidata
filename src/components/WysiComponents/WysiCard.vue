@@ -25,7 +25,7 @@
 
 <script lang="ts" setup>
 import MappingBox from '../MappingBox.vue';
-import { WysiMapping } from '../../store';
+import { WysiMapping } from '../../utils/mappingUtils';
 
 defineProps<{
   compId: number;
