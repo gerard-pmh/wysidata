@@ -1,54 +1,65 @@
 <template>
   <mapping-box :mapping-id="{ compId, boxId: 1 }" :mappings="mappings">
-    Coord
+    Points
   </mapping-box>
-  <mapping-box :mapping-id="{ compId, boxId: 2 }" :mappings="mappings">
-    Others
+  <mapping-box
+    v-for="boxId in lastBoxId - 1"
+    :mapping-id="{ compId, boxId: boxId + 1 }"
+    :mappings="mappings"
+  >
+    Tooltip Contents
   </mapping-box>
-  <div ref="mapRef" class="map-container"></div>
+  <leaflet-wrapper :points="points" :tooltip-contents="tooltipContents" />
 </template>
 
 <script lang="ts" setup>
-import { ref, watchEffect } from 'vue';
+import { computed, effect, Ref, ref } from 'vue';
 import { findMapping, WysiMapping } from '../../utils/mappingUtils';
 import MappingBox from '../MappingBox.vue';
-import L from 'leaflet';
+import { LatLngExpression } from 'leaflet';
+import LeafletWrapper from '../LeafletWrapper.vue';
 
 const props = defineProps<{
   compId: number;
   mappings: WysiMapping[];
 }>();
 
-const mapRef = ref();
+const points = computed(
+  () =>
+    findMapping({ compId: props.compId, boxId: 1 }, props.mappings)
+      ?.value as LatLngExpression[]
+);
 
-let mapInstance: any;
-let markerInstances: any[] = [];
+const lastBoxId: Ref<number> = ref(2);
+const tooltipContents: Ref<string[][]> = ref([]);
 
-watchEffect(() => {
+effect(() => {
   const { compId, mappings } = props;
-  const coords = findMapping({ compId, boxId: 1 }, mappings)?.value as any[];
-  const tooltips = findMapping({ compId, boxId: 2 }, mappings)?.value as any[];
-  if (coords && coords.length) {
-    if (!mapInstance) {
-      mapInstance = L.map(mapRef.value).setView(coords[0], 13);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(mapInstance);
-      coords.forEach(c => {
-        markerInstances.push(L.marker(c).addTo(mapInstance));
-      });
+  let boxId = 2;
+  const tooltipContentsAccumulator = [];
+  while (true) {
+    const mappingValue = findMapping({ compId, boxId }, mappings)
+      ?.value as string[];
+    if (mappingValue) {
+      if (Array.isArray(mappingValue)) {
+        for (let i = 0; i < mappingValue.length; i++) {
+          if (tooltipContentsAccumulator[i]) {
+            tooltipContentsAccumulator[i].push(mappingValue[i]);
+          } else {
+            tooltipContentsAccumulator[i] = [mappingValue[i]];
+          }
+        }
+      } else if (tooltipContentsAccumulator[0]) {
+        tooltipContentsAccumulator[0].push(mappingValue);
+      } else {
+        tooltipContentsAccumulator.push([mappingValue]);
+      }
+      boxId++;
+    } else {
+      break;
     }
-
-    tooltips?.forEach((t, i) => {
-      markerInstances[i]?.bindPopup(t);
-    });
   }
+  tooltipContents.value = tooltipContentsAccumulator;
+  lastBoxId.value = boxId;
 });
 </script>
-
-<style scoped>
-.map-container {
-  height: 180px;
-}
-</style>

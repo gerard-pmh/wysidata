@@ -41,16 +41,16 @@ const maxLength = computed(() => {
 
 const dataType = computed(() => wysiComponentMap[props.comp.template].dataType);
 
-const subMappings = computed(() => {
-  return [...Array(maxLength.value).keys()].map(i =>
+const subMappings = computed(() =>
+  [...Array(maxLength.value).keys()].map(i =>
     props.mappings.map(m => {
       return {
         ...m,
         value: getMappingCases[dataType.value](m.value, i)
       };
     })
-  );
-});
+  )
+);
 
 const stopNesting = computed(() =>
   props.mappings.every(({ value }) => stopNestingCases[dataType.value](value))
