@@ -18,6 +18,7 @@ import { findMapping, WysiMapping } from '../../utils/mappingUtils';
 import MappingBox from '../MappingBox.vue';
 import { LatLngExpression } from 'leaflet';
 import LeafletWrapper from '../LeafletWrapper.vue';
+import { invertTwoDimensionalArray } from '../../utils/genericUtils';
 
 const props = defineProps<{
   compId: number;
@@ -36,30 +37,18 @@ const tooltipContents: Ref<string[][]> = ref([]);
 effect(() => {
   const { compId, mappings } = props;
   let boxId = 2;
-  const tooltipContentsAccumulator = [];
+  const contents = [];
   while (true) {
     const mappingValue = findMapping({ compId, boxId }, mappings)
       ?.value as string[];
     if (mappingValue) {
-      if (Array.isArray(mappingValue)) {
-        for (let i = 0; i < mappingValue.length; i++) {
-          if (tooltipContentsAccumulator[i]) {
-            tooltipContentsAccumulator[i].push(mappingValue[i]);
-          } else {
-            tooltipContentsAccumulator[i] = [mappingValue[i]];
-          }
-        }
-      } else if (tooltipContentsAccumulator[0]) {
-        tooltipContentsAccumulator[0].push(mappingValue);
-      } else {
-        tooltipContentsAccumulator.push([mappingValue]);
-      }
+      contents.push(mappingValue);
       boxId++;
     } else {
       break;
     }
   }
-  tooltipContents.value = tooltipContentsAccumulator;
+  tooltipContents.value = invertTwoDimensionalArray(contents);
   lastBoxId.value = boxId;
 });
 </script>

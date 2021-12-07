@@ -4,7 +4,13 @@
 
 <script setup lang="ts">
 import { ref, watchEffect } from 'vue';
-import { LatLngExpression, Map, Marker, TileLayer } from 'leaflet';
+import {
+  FeatureGroup,
+  LatLngExpression,
+  Map,
+  Marker,
+  TileLayer
+} from 'leaflet';
 
 const props = defineProps<{
   points?: LatLngExpression[];
@@ -13,39 +19,54 @@ const props = defineProps<{
 
 const mapRef = ref();
 
-let mapInstance: any;
-let markerInstances: any[] = [];
+let mapInstance: Map;
+
+const markerInstances: FeatureGroup = new FeatureGroup();
+const openStreetMapContributors: TileLayer = new TileLayer(
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  {
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }
+);
 
 watchEffect(() => {
   const { points, tooltipContents } = props;
   if (points && points.length) {
+    markerInstances.clearLayers();
+
+    points.forEach((point, index) => {
+      const marker = new Marker(point);
+      if (tooltipContents?.[index]) {
+        marker.bindPopup(generateTooltipTemplate(tooltipContents[index]));
+      }
+      markerInstances.addLayer(marker);
+    });
+
     if (!mapInstance) {
-      mapInstance = new Map(mapRef.value).setView(points[0], 13);
-      new TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(mapInstance);
-    } else {
-      markerInstances.forEach(markerInstance => markerInstance.remove());
-      markerInstances.length = 0;
-      mapInstance.setView(points[0], 13);
+      mapInstance = new Map(mapRef.value);
+      mapInstance.addLayer(openStreetMapContributors);
+      mapInstance.addLayer(markerInstances);
     }
-
-    points.forEach(point => {
-      markerInstances.push(new Marker(point).addTo(mapInstance));
-    });
-
-    tooltipContents?.forEach((tooltipContent, index) => {
-      markerInstances[index]?.bindPopup(
-        tooltipContent.map(c => `<p>${c}</p>`).join('')
-      );
-    });
+    mapInstance.fitBounds(markerInstances.getBounds());
+  } else {
+    mapInstance?.remove();
   }
 });
+
+function generateTooltipTemplate(content: string[]): string {
+  return content
+    .map((text, index) =>
+      index === 0
+        ? `<div class="font-bold">${text}</div>`
+        : `<div>${text}</div>`
+    )
+    .join('');
+}
 </script>
 
 <style scoped>
 .map-container {
-  height: 180px;
+  height: 350px;
 }
 </style>

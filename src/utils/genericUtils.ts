@@ -57,3 +57,17 @@ export function isNDimensionalArray<T>(
 export function isCoordinates<T>(array: MultiDimensionalArray<T>): boolean {
   return isOneDimensionalArray(array) && array.length === 2;
 }
+
+export function invertTwoDimensionalArray<T>(array: T[][]): T[][] {
+  const result: T[][] = [];
+  array.forEach(subArray => {
+    subArray.forEach((value, index) => {
+      if (result[index]) {
+        result[index].push(value);
+      } else {
+        result[index] = [value];
+      }
+    });
+  });
+  return result;
+}
