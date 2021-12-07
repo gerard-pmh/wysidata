@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "deploy": "vite build --outDir docs",
+    "deploy": "vite build --base=./ --outDir docs",
     "serve": "vite preview",
     "test": "jest"
   },
