@@ -20,3 +20,7 @@ export function findMapping(
     m => id.compId === m.id.compId && id.boxId === m.id.boxId
   );
 }
+
+export function findLastBoxId(mappings: WysiMapping[]): number {
+  return mappings.length ? Math.max(...mappings.map(m => m.id.boxId)) : 1;
+}

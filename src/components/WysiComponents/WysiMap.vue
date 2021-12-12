@@ -1,29 +1,34 @@
 <template>
-  <mapping-box :mapping-id="{ compId, boxId: 1 }" :mappings="mappings">
-    Points
-  </mapping-box>
-  <mapping-box
-    v-for="boxId in lastBoxId - 1"
-    :mapping-id="{ compId, boxId: boxId + 1 }"
+  <leaflet-wrapper
+    class="relative z-0 h-[350px]"
+    :points="points"
+    :tooltip-contents="tooltipContents"
+  />
+  <mapping-overlay
+    class="relative z-10 h-[350px] mt-[-350px]"
+    v-if="!points || !points.length || isDraggingApiField"
+    :comp-id="compId"
     :mappings="mappings"
-  >
-    Tooltip Contents
-  </mapping-box>
-  <leaflet-wrapper :points="points" :tooltip-contents="tooltipContents" />
+    first-title="Coordinates"
+    second-title="Tooltip Contents"
+  ></mapping-overlay>
 </template>
 
 <script lang="ts" setup>
-import { computed, effect, Ref, ref } from 'vue';
+import { computed } from 'vue';
 import { findMapping, WysiMapping } from '../../utils/mappingUtils';
-import MappingBox from '../MappingBox.vue';
+import MappingOverlay from '../MappingOverlay.vue';
 import { LatLngExpression } from 'leaflet';
 import LeafletWrapper from '../LeafletWrapper.vue';
 import { invertTwoDimensionalArray } from '../../utils/genericUtils';
+import { store } from '../../store';
 
 const props = defineProps<{
   compId: number;
   mappings: WysiMapping[];
 }>();
+
+const isDraggingApiField = computed(() => !!store.state.draggedApiField);
 
 const points = computed(
   () =>
@@ -31,24 +36,9 @@ const points = computed(
       ?.value as LatLngExpression[]
 );
 
-const lastBoxId: Ref<number> = ref(2);
-const tooltipContents: Ref<string[][]> = ref([]);
-
-effect(() => {
-  const { compId, mappings } = props;
-  let boxId = 2;
-  const contents = [];
-  while (true) {
-    const mappingValue = findMapping({ compId, boxId }, mappings)
-      ?.value as string[];
-    if (mappingValue) {
-      contents.push(mappingValue);
-      boxId++;
-    } else {
-      break;
-    }
-  }
-  tooltipContents.value = invertTwoDimensionalArray(contents);
-  lastBoxId.value = boxId;
-});
+const tooltipContents = computed(() =>
+  invertTwoDimensionalArray(
+    props.mappings.filter(m => m.id.boxId > 1).map(m => m.value) as string[][]
+  )
+);
 </script>

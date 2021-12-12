@@ -1,5 +1,5 @@
 <template>
-  <div ref="mapRef" class="map-container"></div>
+  <div ref="mapRef"></div>
 </template>
 
 <script setup lang="ts">
@@ -64,9 +64,3 @@ function generateTooltipTemplate(content: string[]): string {
     .join('');
 }
 </script>
-
-<style scoped>
-.map-container {
-  height: 350px;
-}
-</style>

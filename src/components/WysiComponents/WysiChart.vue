@@ -1,40 +1,23 @@
 <template>
   <div>
-    <div ref="chartRef" class="chart-box relative z-0" />
-    <div class="dnd-box" v-if="!chartRendered || isDraggingApiField">
-      <div class="flex w-3/4">
-        <div class="flex-1 mx-1">
-          <div class="text-center font-bold text-xl mb-2">X</div>
-          <mapping-box
-            :mapping-id="{ compId, boxId: 1 }"
-            :mappings="mappings"
-            :show-api-path="true"
-            class="p-2 border"
-            >drop values</mapping-box
-          >
-        </div>
-        <div class="flex-1 mx-1">
-          <div class="text-center font-bold text-xl mb-2">Y</div>
-          <mapping-box
-            :mapping-id="{ compId, boxId: 2 }"
-            :mappings="mappings"
-            :show-api-path="true"
-            class="p-2 border"
-          >
-            drop values
-          </mapping-box>
-        </div>
-      </div>
-    </div>
+    <div ref="chartRef" class="relative z-0 h-[365px]" />
+    <mapping-overlay
+      class="relative z-10 h-[350px] mt-[-365px]"
+      v-if="!chartRendered || isDraggingApiField"
+      :comp-id="compId"
+      :mappings="mappings"
+      first-title="X"
+      second-title="Y"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import MappingBox from '../MappingBox.vue';
 import { computed, ref, watchEffect } from 'vue';
 import ApexCharts from 'apexcharts';
 import { findMapping, WysiMapping } from '../../utils/mappingUtils';
 import { useStore } from '../../store';
+import MappingOverlay from '../MappingOverlay.vue';
 
 const props = defineProps<{
   compId: number;
@@ -52,18 +35,16 @@ const chartRendered = ref(false);
 
 watchEffect(() => {
   const { compId, mappings } = props;
-  const xMapping = findMapping({ compId, boxId: 1 }, mappings);
-  const yMapping = findMapping({ compId, boxId: 2 }, mappings);
-  const xData = xMapping?.value;
-  const yData = yMapping?.value;
-  if (xData && yData) {
+  const xData = findMapping({ compId, boxId: 1 }, mappings)?.value;
+  const yData = mappings
+    .filter(m => m.id.boxId > 1)
+    .map(m => ({
+      name: m.apiNodeId.path,
+      data: m.value
+    }));
+  if (xData && yData.length) {
     const options = {
-      series: [
-        {
-          name: yMapping.apiNodeId.path,
-          data: yData
-        }
-      ],
+      series: yData,
       chart: {
         height: 350,
         type: 'line',
@@ -95,21 +76,3 @@ watchEffect(() => {
   }
 });
 </script>
-
-<style scoped>
-.chart-box {
-  height: 365px;
-}
-
-.dnd-box {
-  margin-top: -365px;
-  height: 350px;
-  @apply bg-indigo-900
-  opacity-80
-  relative
-  z-10
-  pt-10
-  flex
-  justify-center;
-}
-</style>
