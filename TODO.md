@@ -1,11 +1,11 @@
 # TODO
 
-1. Mapping Overlay
-2. Mise en ligne via github pages, preview et share via url avec mappings encodés en base 64
+2. Preview et share via url avec mappings encodés en base 64
 3. Detection automatique des images
 4. Refonte de component-panel avec nom et miniature du composant
 5. ux sans drag and drop
 6. true wysiwyg, ajout de texte autour des mapping box, changement de style, d'alignement ...
+7. mapping overlay : supprimer un mapping sans tout refaire
 
 
 # NICE TO HAVE
