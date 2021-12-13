@@ -1,16 +1,31 @@
 <template>
-  <div ref="mapRef"></div>
+  <div ref="mapRef" class="rounded"></div>
 </template>
 
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue';
+import { onMounted, ref, watchEffect } from 'vue';
 import {
   FeatureGroup,
+  icon,
   LatLngExpression,
   Map,
   Marker,
   TileLayer
 } from 'leaflet';
+import iconRetinaUrl from '../../node_modules/leaflet/dist/images/marker-icon-2x.png';
+import iconUrl from './../../node_modules/leaflet/dist/images/marker-icon.png';
+import shadowUrl from './../../node_modules/leaflet/dist/images/marker-shadow.png';
+
+Marker.prototype.options.icon = icon({
+  iconRetinaUrl,
+  iconUrl,
+  shadowUrl,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  tooltipAnchor: [16, -28],
+  shadowSize: [41, 41]
+});
 
 const props = defineProps<{
   points?: LatLngExpression[];
@@ -20,6 +35,15 @@ const props = defineProps<{
 const mapRef = ref();
 
 let mapInstance: Map;
+
+onMounted(() => {
+  mapInstance = new Map(mapRef.value);
+  mapInstance.addLayer(openStreetMapContributors);
+  mapInstance.addLayer(markerInstances);
+  if (markerInstances.getLayers().length) {
+    mapInstance.fitBounds(markerInstances.getBounds());
+  }
+});
 
 const markerInstances: FeatureGroup = new FeatureGroup();
 const openStreetMapContributors: TileLayer = new TileLayer(
@@ -32,6 +56,7 @@ const openStreetMapContributors: TileLayer = new TileLayer(
 
 watchEffect(() => {
   const { points, tooltipContents } = props;
+  markerInstances.clearLayers();
   if (points && points.length) {
     markerInstances.clearLayers();
 
@@ -43,14 +68,7 @@ watchEffect(() => {
       markerInstances.addLayer(marker);
     });
 
-    if (!mapInstance) {
-      mapInstance = new Map(mapRef.value);
-      mapInstance.addLayer(openStreetMapContributors);
-      mapInstance.addLayer(markerInstances);
-    }
-    mapInstance.fitBounds(markerInstances.getBounds());
-  } else {
-    mapInstance?.remove();
+    mapInstance?.fitBounds(markerInstances.getBounds());
   }
 });
 

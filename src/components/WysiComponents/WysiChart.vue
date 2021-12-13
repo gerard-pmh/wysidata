@@ -3,7 +3,7 @@
     <div ref="chartRef" class="relative z-0 h-[365px]" />
     <mapping-overlay
       class="relative z-10 h-[350px] mt-[-365px]"
-      v-if="!chartRendered || isDraggingApiField"
+      v-if="isDraggingApiField"
       :comp-id="compId"
       :mappings="mappings"
       first-title="X"
@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watchEffect } from 'vue';
+import { computed, effect, onMounted, ref, watch, watchEffect } from 'vue';
 import ApexCharts from 'apexcharts';
 import { findMapping, WysiMapping } from '../../utils/mappingUtils';
 import { useStore } from '../../store';
@@ -29,11 +29,9 @@ const store = useStore();
 const isDraggingApiField = computed(() => !!store.state.draggedApiField);
 
 const chartRef = ref();
-let chart: ApexCharts;
+let chartInstance: ApexCharts;
 
-const chartRendered = ref(false);
-
-watchEffect(() => {
+const chartOptions = computed(() => {
   const { compId, mappings } = props;
   const xData = findMapping({ compId, boxId: 1 }, mappings)?.value;
   const yData = mappings
@@ -42,37 +40,36 @@ watchEffect(() => {
       name: m.apiNodeId.path,
       data: m.value
     }));
-  if (xData && yData.length) {
-    const options = {
-      series: yData,
-      chart: {
-        height: 350,
-        type: 'line',
-        zoom: {
-          enabled: false
-        }
-      },
-      dataLabels: {
+  return {
+    series: yData,
+    chart: {
+      height: 350,
+      type: 'line',
+      zoom: {
         enabled: false
-      },
-      stroke: {
-        curve: 'straight'
-      },
-      theme: {
-        mode: 'dark'
-      },
-      xaxis: {
-        categories: xData
       }
-    };
-
-    if (chart) {
-      chart.updateOptions(options);
-    } else {
-      chart = new ApexCharts(chartRef.value, options);
-      chart.render();
-      chartRendered.value = true;
+    },
+    dataLabels: {
+      enabled: false
+    },
+    stroke: {
+      curve: 'straight'
+    },
+    theme: {
+      mode: 'dark'
+    },
+    xaxis: {
+      categories: xData ?? []
     }
-  }
+  };
+});
+
+onMounted(() => {
+  chartInstance = new ApexCharts(chartRef.value, chartOptions.value);
+  chartInstance.render();
+});
+
+watch(chartOptions, () => {
+  chartInstance?.updateOptions(chartOptions.value);
 });
 </script>

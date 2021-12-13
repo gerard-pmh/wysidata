@@ -41,7 +41,9 @@ effect(() => {
 });
 
 function share() {
-  navigator.clipboard.writeText(window.location + store.getters.getBase64State);
+  navigator.clipboard.writeText(
+    `${window.location.origin}/#/${store.getters.getBase64State}`
+  );
 }
 
 onMounted(() => {
