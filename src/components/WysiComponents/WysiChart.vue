@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, effect, onMounted, ref, watch, watchEffect } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import ApexCharts from 'apexcharts';
 import { findMapping, WysiMapping } from '../../utils/mappingUtils';
 import { useStore } from '../../store';
