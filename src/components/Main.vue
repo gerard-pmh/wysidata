@@ -41,9 +41,9 @@ effect(() => {
 });
 
 function share() {
-  navigator.clipboard.writeText(
-    `${window.location.origin}/#/${store.getters.getBase64State}`
-  );
+  const rootUrl = window.location.href.split('/#/')[0];
+  const base64State = store.getters.getBase64State;
+  navigator.clipboard.writeText(`${rootUrl}/#/${base64State}`);
 }
 
 onMounted(() => {
