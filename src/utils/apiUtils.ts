@@ -136,3 +136,13 @@ function extractValues(
     });
   }
 }
+
+export function dryApiData(api: Api): Api {
+  return {
+    ...api,
+    loading: true,
+    error: undefined,
+    structure: undefined,
+    resData: undefined
+  };
+}

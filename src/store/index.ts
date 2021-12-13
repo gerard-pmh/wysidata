@@ -5,10 +5,12 @@ import {
   Api,
   ApiNode,
   ApiNodeId,
+  dryApiData,
   extractApiStructureFromRoot,
   mapApiNodes
 } from '../utils/apiUtils';
 import { MappingId, WysiMapping } from '../utils/mappingUtils';
+import { base64UriToObj, objToUriBase64 } from '../utils/base64Utils';
 
 export interface WysiComponent {
   id: number;
@@ -44,6 +46,14 @@ export const store = createStore<State>({
   getters: {
     getMappings: state => (compId: number) => {
       return state.mappings.filter(m => m.id.compId === compId);
+    },
+    getBase64State: state => {
+      return objToUriBase64({
+        ...state,
+        apis: state.apis.map(api => dryApiData(api)),
+        draggedComponent: undefined,
+        draggedApiField: undefined
+      });
     }
   },
   mutations: {
@@ -179,6 +189,16 @@ export const store = createStore<State>({
     },
     disableHighlightMappingBoxes(state) {
       state.mappings = state.mappings.map(m => ({ ...m, highlighted: false }));
+    },
+    loadBase64State(state, base64State: string) {
+      const newState = base64UriToObj(base64State);
+      state.apiIdSeq = newState.apiIdSeq;
+      state.apis = newState.apis;
+      state.compIdSeq = newState.compIdSeq;
+      state.components = newState.components;
+      state.mappings = newState.mappings;
+      state.draggedComponent = undefined;
+      state.draggedApiField = undefined;
     }
   },
   actions: {
@@ -229,6 +249,22 @@ export const store = createStore<State>({
     },
     apiFieldMouseLeave({ commit }) {
       commit('disableHighlightMappingBoxes');
+    },
+    loadBase64State({ commit, dispatch }, base64State: string) {
+      commit('loadBase64State', base64State);
+      dispatch('hydrateApis');
+    },
+    async hydrateApis({ commit, state }) {
+      await Promise.all(
+        state.apis.map(async ({ id, url }) => {
+          try {
+            const res = await axios.get(url);
+            commit('apiDataLoaded', { id, res });
+          } catch (error) {
+            commit('apiDataError', { id, error });
+          }
+        })
+      );
     }
   }
 });
