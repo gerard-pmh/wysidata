@@ -10,7 +10,7 @@ import {
   mapApiNodes
 } from '../utils/apiUtils';
 import { MappingId, WysiMapping } from '../utils/mappingUtils';
-import { base64UriToObj, objToUriBase64 } from '../utils/base64Utils';
+import { base64UriToObj, objToBase64Uri } from '../utils/base64Utils';
 
 export interface WysiComponent {
   id: number;
@@ -48,7 +48,7 @@ export const store = createStore<State>({
       return state.mappings.filter(m => m.id.compId === compId);
     },
     getBase64State: state => {
-      return objToUriBase64({
+      return objToBase64Uri({
         ...state,
         apis: state.apis.map(api => dryApiData(api)),
         draggedComponent: undefined,
