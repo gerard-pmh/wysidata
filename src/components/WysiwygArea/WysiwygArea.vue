@@ -36,10 +36,11 @@
 import WysiComponentRenderer from './WysiComponentRenderer.vue';
 import WysiComponentDropZone from './WysiComponentDropZone.vue';
 import { useStore } from '../../store';
+import { computed } from 'vue';
 
 const store = useStore();
 
-const components = store.state.components;
+const components = computed(() => store.state.components);
 const getMappings = store.getters.getMappings;
 
 function deleteComponent(compId: number) {
