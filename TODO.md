@@ -1,5 +1,6 @@
 # TODO
 
+1. Tableau
 2. Preview et share via url avec mappings encodés en base 64
 3. Detection automatique des images
 4. Refonte de component-panel avec nom et miniature du composant
