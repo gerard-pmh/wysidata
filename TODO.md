@@ -1,12 +1,13 @@
 # TODO
 
 1. Tableau
-2. Preview et share via url avec mappings encodés en base 64
-3. Detection automatique des images
-4. Refonte de component-panel avec nom et miniature du composant
-5. ux sans drag and drop
-6. true wysiwyg, ajout de texte autour des mapping box, changement de style, d'alignement ...
-7. mapping overlay : supprimer un mapping sans tout refaire
+2. CSV support
+3. Preview et share via url avec mappings encodés en base 64
+4. Detection automatique des images
+5. Refonte de component-panel avec nom et miniature du composant
+6. ux sans drag and drop
+7. true wysiwyg, ajout de texte autour des mapping box, changement de style, d'alignement ...
+8. mapping overlay : supprimer un mapping sans tout refaire
 
 
 # NICE TO HAVE
@@ -14,11 +15,6 @@
 1. Export sécurisé avec génération d'une clé en plus de l'url, impossible d'éditer et / ou d'ouvrir le contenu sans la clé
 2. Gestion des champs d'APIs : favoris, recherche, filtre ...
 3. Obtenir plus d'info sur un composant en cliquant dessus
-
-
-
-
-
 
 
 # Important
